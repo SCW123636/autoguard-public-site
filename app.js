@@ -1,0 +1,696 @@
+(() => {
+  const PAGE_LABELS = {
+    demo: "\u6848\u4F8B\u8BB2\u89E3",
+    overview: "\u603B\u89C8",
+    cases: "\u6848\u4F8B\u5206\u6790",
+    method: "\u65B9\u6CD5\u9A8C\u8BC1",
+    newData: "\u65B0\u6570\u636E\u5BA1\u6838"
+  };
+  const DEMO_ENTERPRISE_ISSUES = [
+    {
+      id: "problem-intake",
+      requirementId: "R1",
+      shortTitle: "\u5148\u770B\u6E05\u53D1\u751F\u4E86\u4EC0\u4E48",
+      problem: "\u5F02\u5E38\u63CF\u8FF0\u6A21\u7CCA\uFF0C\u672A\u770B\u6E05\u95EE\u9898\u5C31\u5F00\u59CB\u5F52\u56E0\u3002",
+      explanation: "\u4F01\u4E1A\u62A5\u544A\u4E2D\u7684\u4F53\u9A8C\u63CF\u8FF0\u3001\u76F4\u63A5\u89C2\u5BDF\u548C\u6280\u672F\u6D4B\u91CF\u5F80\u5F80\u6DF7\u5728\u4E00\u8D77\uFF0C\u5BB9\u6613\u8BA9\u540E\u7EED\u6392\u67E5\u4ECE\u9519\u8BEF\u524D\u63D0\u51FA\u53D1\u3002",
+      method: "G1 \u95EE\u9898\u5B9A\u4E49\u4E0E\u4E8B\u4EF6\u5305",
+      methodDetail: "\u5206\u79BB\u4F01\u4E1A\u62A5\u544A\u3001\u53EF\u89C2\u5BDF\u4E8B\u5B9E\u3001\u4F01\u4E1A\u671F\u671B\u3001\u6280\u672F\u5047\u8BBE\u548C\u672A\u77E5\u9879\uFF0C\u5148\u5EFA\u7ACB\u540C\u4E00\u95EE\u9898\u7684\u8303\u56F4\u4E0E\u65F6\u95F4\u951A\u70B9\u3002",
+      skills: [{ name: "autoguard-intake", role: "\u5C06\u4F01\u4E1A\u62A5\u544A\u6574\u7406\u4E3A\u53EF\u5BA1\u8BA1\u7684\u95EE\u9898\u5B9A\u4E49\u3002" }],
+      output: "\u7ED3\u6784\u5316\u95EE\u9898\u7B80\u62A5\u3001\u4E8B\u4EF6\u7A97\u53E3\u548C\u5F85\u8865\u8BC1\u636E\u6E05\u5355\u3002",
+      boundary: "\u62A5\u544A\u4E2D\u7684\u201C\u8F66\u901F 65\u201D\u4ECD\u662F\u9648\u8FF0\uFF0C\u4E0D\u4F1A\u88AB\u5F53\u6210\u5DF2\u590D\u7B97\u7684\u6D4B\u91CF\u4E8B\u5B9E\u3002",
+      caseIds: ["RCA-EXT-001"],
+      caseFinding: "\u4F01\u4E1A\u62A5\u544A\u63CF\u8FF0 ACC \u8DDF\u505C\u9759\u6B62\u524D\u8F66\u65F6\u201C\u8F66\u901F 65\u3001\u5239\u8F66\u665A\u3001\u6709\u6050\u614C\u611F\u201D\u3002\u771F\u5B9E\u6570\u636E\u4E2D\u7EB3\u5165 8 \u6761\u8131\u654F\u6D3E\u751F\u89C2\u5BDF\uFF0C\u4F46\u539F\u59CB MCAP \u672A\u63D0\u4F9B\uFF0C\u56E0\u6B64\u201C65\u201D\u4E0D\u80FD\u590D\u7B97\u4E3A\u6D4B\u91CF\u4E8B\u5B9E\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-OBS-001", "EV-RCA-EXT-001-OBS-004"],
+      caseHandling: "\u5148\u4FDD\u7559\u4F01\u4E1A\u539F\u8BDD\uFF0C\u518D\u628A\u529F\u80FD\u57DF\u3001\u6D3E\u751F\u89C2\u5BDF\u548C\u672A\u77E5\u9879\u5206\u5C42\u3002\u95EE\u9898\u5B9A\u4E49\u5B8C\u6210\u524D\u4E0D\u8F93\u51FA\u539F\u56E0\u3002",
+      caseConclusion: "\u5F62\u6210 ACC \u95EE\u9898\u5B9A\u4E49\u548C\u8BC1\u636E\u7F3A\u53E3\uFF1B\u672C\u6848\u53EF\u8FDB\u5165\u53D7\u9650\u5019\u9009\u5BA1\u6838\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u786E\u8BA4\u5B9E\u9645\u8F66\u901F\u3001\u771F\u5B9E\u5236\u52A8\u65F6\u523B\u3001\u751F\u4EA7\u6839\u56E0\u6216\u8D23\u4EFB\u57DF\u3002"
+    },
+    {
+      id: "evidence-freeze",
+      requirementId: "R2",
+      shortTitle: "\u8BA9\u6750\u6599\u56F4\u7ED5\u540C\u4E00\u95EE\u9898",
+      problem: "\u65E5\u5FD7\u3001\u68C0\u67E5\u7ED3\u679C\u548C\u9644\u4EF6\u5206\u6563\uFF0C\u65E0\u6CD5\u56F4\u7ED5\u540C\u4E00 Case \u8FFD\u6EAF\u3002",
+      explanation: "\u4F01\u4E1A\u9700\u8981\u77E5\u9053\u6BCF\u4E00\u6761\u5224\u65AD\u5F15\u7528\u4E86\u4EC0\u4E48\u6750\u6599\uFF0C\u4E5F\u9700\u8981\u9632\u6B62\u6750\u6599\u53D8\u5316\u540E\u65E7\u7ED3\u8BBA\u7EE7\u7EED\u88AB\u4F7F\u7528\u3002",
+      method: "G2 \u8BC1\u636E\u51BB\u7ED3\u4E0E\u8DE8\u7CFB\u7EDF\u5173\u8054",
+      methodDetail: "\u4E3A\u62A5\u544A\u3001\u65E5\u5FD7\u548C\u6D3E\u751F\u89C2\u5BDF\u5EFA\u7ACB Evidence ID\u3001\u6765\u6E90\u3001\u54C8\u5E0C\u548C\u65F6\u95F4\u8BED\u4E49\uFF0C\u5E76\u51BB\u7ED3\u4E3A\u5F53\u524D\u8BC1\u636E\u5FEB\u7167\u3002",
+      skills: [{ name: "autoguard-evidence-chain", role: "\u751F\u6210\u53EF\u8FFD\u6EAF\u8BC1\u636E\u5FEB\u7167\u548C\u5F15\u7528\u5173\u7CFB\u3002" }],
+      output: "\u8BC1\u636E\u76EE\u5F55\u3001\u5FEB\u7167\u54C8\u5E0C\u3001\u6765\u6E90\u5173\u7CFB\u548C\u7F3A\u5931\u8BC1\u636E\u6E05\u5355\u3002",
+      boundary: "\u6750\u6599\u53D8\u5316\u540E\u65E7\u5206\u6790\u5FC5\u987B\u91CD\u5F00\uFF0C\u4E0D\u80FD\u7EE7\u7EED\u4F5C\u4E3A\u5F53\u524D\u7ED3\u8BBA\u4F9D\u636E\u3002",
+      caseIds: ["RCA-EXT-001"],
+      caseFinding: "\u672C\u6848 8 \u6761\u6D3E\u751F\u89C2\u5BDF\u5747\u6709\u72EC\u7ACB Evidence ID\uFF1B\u652F\u6301\u65B9\u5411\u3001\u672A\u89C2\u5BDF\u68C0\u67E5\u548C\u5B57\u6BB5\u4E0D\u8DB3\u88AB\u5206\u522B\u8BB0\u5F55\uFF0C\u5E76\u4E0E\u5F53\u524D\u4E0D\u53EF\u53D8\u5FEB\u7167\u7ED1\u5B9A\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-OBS-001", "EV-RCA-EXT-001-OBS-005", "EV-RCA-EXT-001-OBS-008"],
+      caseHandling: "\u6309\u6765\u6E90\u3001\u72B6\u6001\u548C\u54C8\u5E0C\u51BB\u7ED3\u8BC1\u636E\uFF1B\u540E\u7EED\u5019\u9009\u53EA\u80FD\u5F15\u7528\u8FD9\u4EFD\u5FEB\u7167\u5185\u7684\u6709\u6548 Evidence ID\u3002",
+      caseConclusion: "\u4F01\u4E1A\u53EF\u56DE\u770B\u6BCF\u6761\u5224\u65AD\u6765\u81EA\u54EA\u9879\u89C2\u5BDF\uFF0C\u4E5F\u80FD\u8BC6\u522B\u54EA\u4E9B\u5173\u952E\u6750\u6599\u7F3A\u5931\u3002",
+      caseNonClaim: "\u8BC1\u636E\u53EF\u8FFD\u6EAF\u4E0D\u4EE3\u8868\u8BC1\u636E\u5145\u5206\uFF0C\u4E5F\u4E0D\u4EE3\u8868\u5019\u9009\u5DF2\u7ECF\u88AB\u8BC1\u660E\u3002"
+    },
+    {
+      id: "candidate-analysis",
+      requirementId: "R3",
+      shortTitle: "\u591A\u79CD\u89E3\u91CA\u4E0D\u76F4\u63A5\u5B9A\u56E0",
+      problem: "\u540C\u4E00\u5F02\u5E38\u5B58\u5728\u591A\u79CD\u89E3\u91CA\uFF0CAI \u5BB9\u6613\u628A\u7EBF\u7D22\u76F4\u63A5\u5199\u6210\u6839\u56E0\u3002",
+      explanation: "\u4F8B\u5982 ACC \u5236\u52A8\u504F\u665A\u53EF\u80FD\u6D89\u53CA\u76EE\u6807\u8FD0\u52A8\u3001\u63A7\u5236\u8BF7\u6C42\u3001\u7EB5\u5411\u54CD\u5E94\u7B49\u591A\u6761\u94FE\u8DEF\uFF0C\u4E0D\u80FD\u53EA\u9009\u4E00\u4E2A\u770B\u4F3C\u5408\u7406\u7684\u7B54\u6848\u3002",
+      method: "G3 \u53D7\u9650\u5019\u9009\u4E0E\u53CD\u8BC1\u5206\u6790",
+      methodDetail: "\u4FDD\u7559\u5E76\u5217\u5019\u9009\uFF0C\u4E3A\u6BCF\u4E2A\u5019\u9009\u7ED1\u5B9A\u652F\u6301\u8BC1\u636E\u3001\u53CD\u8BC1\u3001\u7F3A\u5931\u8BC1\u636E\u548C\u66FF\u4EE3\u89E3\u91CA\uFF1B\u8BC1\u636E\u4E0D\u8DB3\u65F6\u660E\u786E\u505C\u7B54\u3002",
+      skills: [{ name: "autoguard-candidate-analysis", role: "\u751F\u6210\u53D7\u9650\u5019\u9009\uFF0C\u800C\u4E0D\u662F\u786E\u8BA4\u6839\u56E0\u3002" }],
+      output: "\u5019\u9009\u77E9\u9635\u3001\u53CD\u8BC1\u3001\u66FF\u4EE3\u89E3\u91CA\u4E0E\u505C\u7B54\u539F\u56E0\u3002",
+      boundary: "\u5019\u9009\u4EC5\u662F\u5F53\u524D\u6392\u67E5\u65B9\u5411\uFF0C\u4E0D\u7B49\u4E8E\u751F\u4EA7\u6839\u56E0\u3001\u8D23\u4EFB\u5F52\u5C5E\u6216\u4E8B\u4EF6\u7EA7\u5F52\u56E0\u3002",
+      caseIds: ["RCA-EXT-001"],
+      caseFinding: "\u540C\u4E00 ACC \u5F02\u5E38\u540C\u65F6\u51FA\u73B0\u76EE\u6807\u8FD0\u52A8\u5B66\u3001\u81EA\u8F66\u7EB5\u5411\u632F\u8361\u3001ACC \u8BF7\u6C42\u632F\u8361\u548C\u5B9E\u9645\u51CF\u901F\u5EA6\u5173\u7CFB\u56DB\u7C7B\u652F\u6301\u89C2\u5BDF\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-OBS-001", "EV-RCA-EXT-001-OBS-002", "EV-RCA-EXT-001-OBS-003", "EV-RCA-EXT-001-OBS-004"],
+      caseHandling: "\u56DB\u4E2A\u673A\u5236\u5E76\u5217\u4FDD\u7559\uFF0C\u6BCF\u4E2A\u5019\u9009\u7ED1\u5B9A\u81EA\u5DF1\u7684\u652F\u6301\u9879\u3001\u8303\u56F4\u6392\u9664\u9879\u548C\u533A\u5206\u6027\u7F3A\u53E3\uFF0C\u4E0D\u5F3A\u884C\u6392\u5E8F\u4E3A\u552F\u4E00\u7B54\u6848\u3002",
+      caseConclusion: "\u8F93\u51FA 4 \u4E2A\u201C\u4EC5\u9650\u672C\u6848\u201D\u7684\u53D7\u9650\u5019\u9009\uFF0C\u4EA4\u7ED9\u4F01\u4E1A\u4EBA\u5DE5\u5BA1\u6838\u6392\u67E5\u4EF7\u503C\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u628A\u4EFB\u4E00\u5019\u9009\u5199\u6210\u751F\u4EA7\u6839\u56E0\uFF0C\u4E5F\u4E0D\u80FD\u636E\u6B64\u5206\u914D\u611F\u77E5\u3001\u63A7\u5236\u6216\u6267\u884C\u8D23\u4EFB\u3002"
+    },
+    {
+      id: "ota-gate",
+      requirementId: "R4",
+      shortTitle: "OTA \u540E\u5F02\u5E38\u4E0D\u7B49\u4E8E OTA \u539F\u56E0",
+      problem: "\u5F02\u5E38\u53D1\u751F\u5728 OTA \u4E4B\u540E\uFF0C\u65F6\u95F4\u76F8\u5173\u5BB9\u6613\u88AB\u8BEF\u5F53\u6210 OTA \u56E0\u679C\u3002",
+      explanation: "\u4EC5\u51ED\u5347\u7EA7\u65F6\u95F4\u65E9\u4E8E\u5F02\u5E38\u65F6\u95F4\uFF0C\u65E0\u6CD5\u6392\u9664\u573A\u666F\u3001\u8F66\u8F86\u3001\u914D\u7F6E\u548C\u5176\u4ED6\u540C\u65F6\u53D8\u5316\u56E0\u7D20\u3002",
+      method: "G3 OTA \u4E8B\u5B9E\u4E0E\u56E0\u679C\u95E8\u7981",
+      methodDetail: "\u5206\u522B\u6838\u9A8C\u7248\u672C\u3001\u6FC0\u6D3B\u65F6\u95F4\u3001\u53D8\u66F4\u6A21\u5757\u3001\u5F71\u54CD\u8303\u56F4\u3001\u672A\u5347\u7EA7\u5BF9\u7167\u3001\u56DE\u6EDA\u548C\u5355\u53D8\u91CF\u5E72\u9884\u3002",
+      skills: [{ name: "autoguard-ota-gate", role: "\u68C0\u67E5 OTA \u56E0\u679C\u8868\u8FBE\u662F\u5426\u5177\u5907\u8BC1\u636E\u6761\u4EF6\u3002" }],
+      output: "OTA \u4E8B\u5B9E\u5305\u3001\u5173\u8054\u7B49\u7EA7\u3001\u6DF7\u6742\u56E0\u7D20\u6E05\u5355\u548C\u62D2\u7EDD\u5F52\u56E0\u8BF4\u660E\u3002",
+      boundary: "\u5F53\u524D\u771F\u5B9E\u6570\u636E\u6CA1\u6709\u5B8C\u6574 OTA \u4E8B\u5B9E\u548C\u5DE5\u7A0B\u5BF9\u7167\uFF0C\u56E0\u6B64\u7981\u6B62\u8F93\u51FA OTA \u6839\u56E0\u3002",
+      caseIds: ["RCA-EXT-001"],
+      caseFinding: "\u672C\u6848\u771F\u5B9E\u6570\u636E\u672A\u63D0\u4F9B OTA \u6D3B\u52A8\u7F16\u53F7\u3001\u5347\u7EA7\u524D\u540E\u7248\u672C\u3001\u6FC0\u6D3B\u65F6\u95F4\u548C\u53D8\u66F4\u6A21\u5757\uFF0C\u4E5F\u6CA1\u6709\u672A\u5347\u7EA7\u5BF9\u7167\u6216\u56DE\u6EDA\u7ED3\u679C\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-MISSING-OTA-CAMPAIGN-ID", "EV-RCA-EXT-001-MISSING-OTA-BEFORE-VERSION", "EV-RCA-EXT-001-MISSING-OTA-AFTER-VERSION"],
+      caseHandling: "OTA \u95E8\u7981\u5148\u68C0\u67E5\u7248\u672C\u4E8B\u5B9E\uFF0C\u518D\u68C0\u67E5\u5BF9\u7167\u548C\u5E72\u9884\uFF1B\u5173\u952E\u524D\u63D0\u7F3A\u5931\u65F6\u76F4\u63A5\u963B\u65AD OTA \u56E0\u679C\u8868\u8FBE\u3002",
+      caseConclusion: "\u672C\u6848 OTA \u72B6\u6001\u4E3A\u201C\u672A\u8BC4\u4F30\u201D\uFF0C\u8FD9\u8BC1\u660E\u65B9\u6CD5\u80FD\u591F\u62D2\u7EDD\u6CA1\u6709\u4F9D\u636E\u7684 OTA \u5F52\u56E0\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u8BF4\u5F02\u5E38\u7531\u67D0\u6B21 OTA\u3001\u67D0\u4E2A\u7248\u672C\u6216\u67D0\u4E2A\u53D8\u66F4\u6A21\u5757\u5BFC\u81F4\u3002"
+    },
+    {
+      id: "human-review",
+      requirementId: "R5",
+      shortTitle: "AI \u7ED3\u679C\u5FC5\u987B\u53EF\u76D1\u7763",
+      problem: "AI \u8BCA\u65AD\u9700\u8981\u4EBA\u5DE5\u76D1\u7763\uFF0C\u4F46\u5BA1\u6838\u610F\u89C1\u7F3A\u5C11\u7EDF\u4E00\u4F9D\u636E\u548C\u7559\u75D5\u3002",
+      explanation: "\u4F01\u4E1A\u9700\u8981\u5BA1\u6838\u7684\u662F\u8BC1\u636E\u8FB9\u754C\u548C\u4E0B\u4E00\u6B65\u52A8\u4F5C\uFF0C\u800C\u4E0D\u662F\u8BA9\u5BA1\u6838\u4EBA\u5458\u4E3A AI \u7684\u6839\u56E0\u5224\u65AD\u80CC\u4E66\u3002",
+      method: "G4 \u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838",
+      methodDetail: "\u5BA1\u6838\u51BB\u7ED3\u8BC1\u636E\u3001\u5019\u9009\u8FB9\u754C\u3001\u7F3A\u5931\u8BC1\u636E\u4E0E\u9A8C\u8BC1\u8BA1\u5212\uFF1B\u4EBA\u5DE5\u53EA\u6279\u51C6\u4E0B\u4E00\u9636\u6BB5\u52A8\u4F5C\u3002",
+      skills: [{ name: "autoguard-human-review", role: "\u628A\u5BA1\u6838\u51B3\u5B9A\u7ED1\u5B9A\u5230\u5F53\u524D\u8BC1\u636E\u5FEB\u7167\u3002" }],
+      output: "\u5BA1\u6838\u4F9D\u636E\u3001\u51B3\u5B9A\u8303\u56F4\u3001\u5931\u6548\u6761\u4EF6\u548C\u5BA1\u8BA1\u8BB0\u5F55\u3002",
+      boundary: "\u5BA1\u6838\u89D2\u8272\u3001\u6743\u9650\u548C\u4EBA\u6570\u7531\u4F01\u4E1A\u5236\u5EA6\u914D\u7F6E\uFF0C\u7CFB\u7EDF\u4E0D\u9884\u8BBE\u201C\u6279\u51C6 AI \u6839\u56E0\u201D\u3002",
+      caseIds: ["RCA-EXT-004"],
+      caseFinding: "\u4F01\u4E1A\u62A5\u544A\u79F0 ACC \u8DDF\u505C\u9759\u6B62\u8F66\u8F86\u65F6\u201C\u65E0\u5239\u8F66\u8FF9\u8C61\u201D\uFF0C\u6D3E\u751F\u68C0\u67E5\u5374\u8BB0\u5F55\u5230\u91CD\u51CF\u901F\u548C jerk \u89C2\u5BDF\uFF0C\u53CC\u65B9\u8BED\u4E49\u4E0E\u65F6\u95F4\u672A\u5B8C\u6210\u7ED1\u5B9A\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-004-CLAIM-001", "EV-RCA-EXT-004-OBS-004", "EV-RCA-EXT-004-OBS-005"],
+      caseHandling: "\u7CFB\u7EDF\u5EFA\u7ACB\u8BC1\u636E\u5F20\u529B\uFF0C\u4E0D\u66FF\u4EBA\u5DE5\u88C1\u51B3\u54EA\u4E00\u65B9\u6B63\u786E\uFF1B\u5BA1\u6838\u4EBA\u6838\u5BF9\u53CC\u65B9\u4F9D\u636E\uFF0C\u53EA\u51B3\u5B9A\u8865\u8BC1\u3001\u505C\u7B54\u6216\u4E0B\u4E00\u6B65\u9A8C\u8BC1\u3002",
+      caseConclusion: "\u672C\u6848\u8FDB\u5165\u201C\u8BC1\u636E\u5F20\u529B + \u7EC8\u6B62\u6027\u505C\u7B54\u201D\uFF0C\u5BA1\u6838\u8BB0\u5F55\u7ED1\u5B9A\u5F53\u524D\u8BC1\u636E\u5FEB\u7167\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u628A\u6D3E\u751F\u68C0\u67E5\u8986\u76D6\u4F01\u4E1A\u62A5\u544A\uFF0C\u4E5F\u4E0D\u80FD\u8BA9\u5BA1\u6838\u4EBA\u66FF AI \u6279\u51C6\u6839\u56E0\u3002"
+    },
+    {
+      id: "scenario-reconstruction",
+      requirementId: "R6",
+      shortTitle: "\u590D\u6742\u573A\u666F\u770B\u6E05\u4EA4\u4E92\u5173\u7CFB",
+      problem: "\u590D\u6742\u573A\u666F\u4E2D\u53C2\u4E0E\u8005\u3001\u906E\u6321\u548C\u4E34\u65F6\u89C4\u5219\u4F7F\u65E5\u5FD7\u96BE\u4EE5\u7406\u89E3\u3002",
+      explanation: "\u5728\u6821\u56ED\u3001\u56ED\u533A\u6216\u5F00\u653E\u9053\u8DEF\u4E2D\uFF0C\u5355\u4E00\u65E5\u5FD7\u7247\u6BB5\u65E0\u6CD5\u5929\u7136\u8BF4\u660E\u53C2\u4E0E\u8005\u4E4B\u95F4\u7684\u5148\u540E\u548C\u5F71\u54CD\u5173\u7CFB\u3002",
+      method: "G3 \u573A\u666F\u91CD\u5EFA\u5206\u652F",
+      methodDetail: "\u6309\u9700\u7EC4\u7EC7\u65F6\u95F4\u533A\u95F4\u3001\u53C2\u4E0E\u8005\u3001\u8F68\u8FF9\u3001\u89C4\u5219\u548C\u4E0D\u53EF\u89C2\u6D4B\u9879\uFF0C\u4FDD\u7559\u591A\u4E2A\u53EF\u884C\u573A\u666F\u5206\u652F\u3002",
+      skills: [{ name: "autoguard-scenario-reconstruction", role: "\u6784\u5EFA\u573A\u666F\u5206\u652F\u4E0E\u4EA4\u4E92\u5173\u7CFB\uFF0C\u4E0D\u8865\u9020\u7F3A\u5931\u4E8B\u5B9E\u3002" }],
+      output: "\u573A\u666F\u5206\u652F\u3001\u4EA4\u4E92\u5173\u7CFB\u3001\u65F6\u95F4\u504F\u5E8F\u548C\u6C38\u4E45\u4E0D\u53EF\u89C2\u6D4B\u9879\u3002",
+      boundary: "\u5F53\u524D\u771F\u5B9E\u6570\u636E\u7F3A\u5C11\u8FDE\u7EED\u8F68\u8FF9\u3001\u5A92\u4F53\u548C\u89C4\u5219\u6B63\u6587\uFF0C\u4E0D\u80FD\u58F0\u79F0\u5DF2\u5B8C\u6210\u771F\u5B9E\u573A\u666F\u91CD\u5EFA\u3002",
+      caseIds: ["RCA-EXT-005"],
+      caseFinding: "\u4F01\u4E1A\u62A5\u544A\u4E3A\u201C\u538B\u5408\u6D41\u7EBF LCC \u672A\u9000\u51FA\u201D\u3002\u6D3E\u751F\u6570\u636E\u89C2\u5BDF\u5230\u8F66\u9053\u51E0\u4F55\u5F02\u5E38\uFF0C\u4F46 LCC \u9000\u51FA\u3001\u8F66\u8F86\u6446\u52A8\u548C\u8F66\u9053\u8FDE\u7EED\u6027\u68C0\u67E5\u5747\u5B57\u6BB5\u4E0D\u8DB3\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-OBS-003", "EV-RCA-EXT-005-OBS-005"],
+      caseHandling: "\u53EA\u8FD8\u539F\u5DF2\u77E5\u7684\u8F66\u9053\u51E0\u4F55\u7EBF\u7D22\u548C\u529F\u80FD\u72B6\u6001\u7F3A\u53E3\uFF0C\u628A\u65E0\u6CD5\u786E\u8BA4\u7684\u53C2\u4E0E\u5173\u7CFB\u4FDD\u7559\u4E3A\u573A\u666F\u5206\u652F\u6761\u4EF6\u3002",
+      caseConclusion: "\u5F62\u6210\u6709\u9650\u573A\u666F\u6846\u67B6\u548C\u201C\u8F66\u9053\u51E0\u4F55\u5F02\u5E38\u201D\u53D7\u9650\u5019\u9009\uFF0C\u660E\u786E\u5217\u51FA\u65E0\u6CD5\u8FD8\u539F\u7684\u90E8\u5206\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u58F0\u79F0\u5DF2\u91CD\u5EFA\u8F66\u8F86\u771F\u5B9E\u8F68\u8FF9\uFF0C\u4E5F\u4E0D\u80FD\u786E\u8BA4 LCC \u4E3A\u4F55\u672A\u9000\u51FA\u3002"
+    },
+    {
+      id: "engineering-validation",
+      requirementId: "R8",
+      shortTitle: "\u5019\u9009\u5FC5\u987B\u53EF\u9A8C\u8BC1\u548C\u8BC1\u4F2A",
+      problem: "\u5019\u9009\u4E0D\u80FD\u505C\u5728\u6587\u5B57\u89E3\u91CA\uFF0C\u5FC5\u987B\u80FD\u591F\u590D\u73B0\u3001\u9A8C\u8BC1\u548C\u8BC1\u4F2A\u3002",
+      explanation: "\u4F01\u4E1A\u9700\u8981\u628A\u6392\u67E5\u65B9\u5411\u8F6C\u5316\u4E3A\u53EF\u6267\u884C\u7684\u5DE5\u7A0B\u4EFB\u52A1\uFF0C\u800C\u4E0D\u662F\u628A\u201CAI \u8BA4\u4E3A\u201D\u5F53\u4F5C\u5DE5\u7A0B\u7ED3\u8BBA\u3002",
+      method: "G5 \u9A8C\u8BC1\u534F\u8BAE + G6 \u5DE5\u7A0B\u9A8C\u8BC1\u7ED3\u679C",
+      methodDetail: "\u5148\u51BB\u7ED3\u57FA\u7EBF\u3001\u5355\u4E00\u5E72\u9884\u3001\u5BF9\u7167\u3001\u5224\u636E\u548C\u505C\u6B62\u89C4\u5219\uFF0C\u518D\u8BB0\u5F55\u5DE5\u7A0B\u8FD0\u884C\u4E0E\u5DEE\u5206\u7ED3\u679C\u3002",
+      skills: [{ name: "autoguard-validation-case", role: "\u751F\u6210\u53EF\u8BC1\u4F2A\u9A8C\u8BC1\u534F\u8BAE\uFF0C\u5E76\u7EA6\u675F\u7ED3\u679C\u8868\u8FBE\u3002" }],
+      output: "\u9A8C\u8BC1\u534F\u8BAE\u3001\u8FD0\u884C\u8BB0\u5F55\u548C\u652F\u6301\u3001\u8BC1\u4F2A\u3001\u4E0D\u786E\u5B9A\u6216\u4E0D\u53EF\u8BC4\u4F30\u7684\u7ED3\u679C\u3002",
+      boundary: "\u5F53\u524D\u6570\u636E\u6CA1\u6709\u56DE\u653E\u3001\u4EFF\u771F\u3001\u5BF9\u7167\u6216\u56DE\u6EDA\u7ED3\u679C\uFF0C\u5019\u9009\u5C1A\u672A\u88AB\u5DE5\u7A0B\u9A8C\u8BC1\u3002",
+      caseIds: ["RCA-EXT-005"],
+      caseFinding: "\u672C\u6848\u6709\u201C\u8F66\u9053\u51E0\u4F55\u5F02\u5E38\u201D\u53D7\u9650\u5019\u9009\uFF0C\u4F46\u539F\u59CB\u8FDE\u7EED\u4FE1\u53F7\u3001\u56DE\u653E\u3001\u5BF9\u7167\u548C\u5E72\u9884\u7ED3\u679C\u5747\u4E0D\u53EF\u7528\uFF0C\u5F53\u524D validation_allowed \u4E3A false\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-MISSING-RAW-MCAP", "EV-RCA-EXT-005-MISSING-TIME-COORDINATE"],
+      caseHandling: "\u628A\u5019\u9009\u6539\u5199\u4E3A\u53EF\u8BC1\u4F2A\u4EFB\u52A1\uFF1A\u51BB\u7ED3\u57FA\u7EBF\u3001\u8865\u9F50\u53EF\u6267\u884C\u8F93\u5165\u3001\u8BBE\u7F6E\u5355\u4E00\u5E72\u9884\u3001\u5BF9\u7167\u6307\u6807\u548C\u505C\u6B62\u89C4\u5219\u3002",
+      caseConclusion: "\u5F53\u524D\u7ED3\u8BBA\u662F\u201C\u5C1A\u4E0D\u53EF\u5DE5\u7A0B\u9A8C\u8BC1\u201D\uFF1B\u4F01\u4E1A\u5F97\u5230\u7684\u662F\u9A8C\u8BC1\u524D\u63D0\u548C\u4EFB\u52A1\u7ED3\u6784\uFF0C\u800C\u4E0D\u662F\u5047\u60F3\u7ED3\u679C\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u5BA3\u79F0\u5019\u9009\u5DF2\u88AB\u590D\u73B0\u3001\u652F\u6301\u6216\u8BC1\u4F2A\uFF0C\u4E5F\u4E0D\u80FD\u5EFA\u8BAE\u76F4\u63A5\u4FEE\u590D\u6216\u53D1\u5E03\u3002"
+    },
+    {
+      id: "audit-evidence",
+      requirementId: "R9",
+      shortTitle: "\u8D28\u91CF\u4E0E\u6CD5\u89C4\u9700\u8981\u8BC1\u636E\u95ED\u73AF",
+      problem: "\u8D28\u91CF\u3001\u6CD5\u89C4\u548C\u5185\u90E8\u5BA1\u67E5\u9700\u8981\u5B8C\u6574\u3001\u8FDE\u7EED\u3001\u53EF\u8FFD\u6EAF\u7684\u8BC1\u636E\u5305\u3002",
+      explanation: "\u4F01\u4E1A\u4E0D\u4EC5\u9700\u8981\u7ED3\u679C\uFF0C\u8FD8\u8981\u80FD\u56DE\u770B\u6765\u6E90\u3001\u5206\u6790\u4F9D\u636E\u3001\u4EBA\u5DE5\u51B3\u5B9A\u3001\u5DE5\u7A0B\u9A8C\u8BC1\u548C\u540E\u7EED\u5173\u95ED\u8FC7\u7A0B\u3002",
+      method: "G2 + G4 + G6 + G7 \u5BA1\u8BA1\u95ED\u73AF",
+      methodDetail: "\u6301\u7EED\u8BB0\u5F55\u8BC1\u636E\u5FEB\u7167\u3001\u5019\u9009\u5F15\u7528\u3001\u5BA1\u6838\u3001\u5DE5\u7A0B\u7ED3\u679C\u3001\u4FEE\u590D\u3001\u56DE\u5F52\u4E0E\u5173\u95ED\u72B6\u6001\u3002",
+      skills: [
+        { name: "autoguard-evidence-chain", role: "\u51BB\u7ED3\u6765\u6E90\u4E0E\u8BC1\u636E\u5F15\u7528\u3002" },
+        { name: "autoguard-human-review", role: "\u8BB0\u5F55\u8D23\u4EFB\u5BA1\u6838\u3002" },
+        { name: "autoguard-validation-case", role: "\u8BB0\u5F55\u9A8C\u8BC1\u534F\u8BAE\u4E0E\u7ED3\u679C\u3002" },
+        { name: "autoguard-closure-capa", role: "\u8BB0\u5F55\u4FEE\u590D\u3001\u56DE\u5F52\u548C\u5173\u95ED\u6761\u4EF6\u3002" }
+      ],
+      output: "\u53EF\u8FFD\u6EAF\u8BC1\u636E\u5305\u3001\u72B6\u6001\u8FC1\u79FB\u8BB0\u5F55\u548C\u5BA1\u8BA1\u5DE5\u4EF6\u3002",
+      boundary: "\u5F53\u524D\u5DF2\u9A8C\u8BC1\u8BC1\u636E\u94FE\u548C\u5BA1\u6838\u95E8\u7981\uFF0C\u4E0D\u80FD\u76F4\u63A5\u5BA3\u79F0\u5DF2\u6EE1\u8DB3\u4F01\u4E1A\u5168\u90E8\u91CF\u4EA7\u5408\u89C4\u6D41\u7A0B\u3002",
+      caseIds: ["RCA-EXT-008"],
+      caseFinding: "\u4F01\u4E1A\u62A5\u544A\u6D89\u53CA LCC \u5728\u5355\u53CC\u7EBF\u53D8\u5316\u5904\u9A76\u5411\u62A4\u680F\uFF1B\u6D3E\u751F\u6570\u636E\u652F\u6301\u8F66\u9053\u51E0\u4F55\u4E0E\u8F66\u9053\u611F\u77E5\u5F02\u5E38\u89C2\u5BDF\uFF0C\u5176\u4F59\u5173\u952E\u68C0\u67E5\u5B57\u6BB5\u4E0D\u8DB3\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-008-OBS-001", "EV-RCA-EXT-008-OBS-002", "EV-RCA-EXT-008-OBS-003"],
+      caseHandling: "\u8BC1\u636E\u5F15\u7528\u3001\u505C\u7B54\u51B3\u5B9A\u548C\u5B89\u5168\u4F18\u5148\u8DEF\u7531\u540C\u65F6\u7559\u75D5\uFF1B\u9AD8\u540E\u679C\u62A5\u544A\u4E0D\u7B49\u5F85\u6280\u672F\u5F52\u56E0\u5373\u53EF\u8FDB\u5165\u4F01\u4E1A\u5B89\u5168\u590D\u6838\u3002",
+      caseConclusion: "\u672C\u6848\u5F62\u6210\u201C\u5B89\u5168\u4F18\u5148 + \u6280\u672F\u505C\u7B54\u201D\u7684\u53CC\u8DEF\u5F84\u8BB0\u5F55\uFF0C\u540E\u7EED\u52A8\u4F5C\u53EF\u6309\u540C\u4E00\u5FEB\u7167\u5BA1\u8BA1\u3002",
+      caseNonClaim: "\u4E0D\u80FD\u786E\u8BA4\u78B0\u649E\u4E8B\u5B9E\u3001\u4F24\u5BB3\u7B49\u7EA7\u3001\u6280\u672F\u6839\u56E0\uFF0C\u4E5F\u4E0D\u80FD\u636E\u6B64\u58F0\u79F0\u5DF2\u6EE1\u8DB3\u5168\u90E8\u91CF\u4EA7\u5408\u89C4\u8981\u6C42\u3002"
+    },
+    {
+      id: "method-validation",
+      requirementId: "R10",
+      shortTitle: "\u5148\u9A8C\u8BC1\u65B9\u6CD5\uFF0C\u4E0D\u5305\u88C5\u51C6\u786E\u7387",
+      problem: "\u4F01\u4E1A\u9700\u8981\u9A8C\u8BC1\u65B9\u6CD5\u53EF\u9760\u6027\uFF0C\u4E0D\u80FD\u5728\u6CA1\u6709\u6807\u51C6\u7B54\u6848\u65F6\u5BA3\u79F0\u8BCA\u65AD\u51C6\u786E\u7387\u3002",
+      explanation: "\u65B9\u6CD5\u9A8C\u8BC1\u5E94\u68C0\u67E5\u7CFB\u7EDF\u662F\u5426\u6B63\u786E\u6267\u884C\u8BC1\u636E\u5F15\u7528\u3001\u5019\u9009\u9650\u5236\u548C\u62D2\u7B54\u8FB9\u754C\uFF0C\u800C\u4E0D\u662F\u628A\u89C4\u5219\u5206\u6D41\u4F2A\u88C5\u6210\u6A21\u578B\u5206\u6570\u3002",
+      method: "M0 \u65B9\u6CD5\u884C\u4E3A\u4E0E\u8D8A\u754C\u9A8C\u8BC1",
+      methodDetail: "\u4F7F\u7528\u540C\u4E00\u771F\u5B9E\u8F93\u5165\u8FDB\u884C\u4E00\u81F4\u6027\u3001\u5F15\u7528\u3001\u7981\u6B62\u5B57\u6BB5\u548C\u53D8\u5F02\u6D4B\u8BD5\uFF0C\u9A8C\u8BC1\u65B9\u6CD5\u662F\u5426\u7A33\u5B9A\u9075\u5B88\u8FB9\u754C\u3002",
+      skills: [{ name: "\u65E0\u72EC\u7ACB Skill", role: "\u7531\u72EC\u7ACB\u65B9\u6CD5\u9A8C\u8BC1\u5668\u4E0E\u5951\u7EA6\u6D4B\u8BD5\u6267\u884C\u3002" }],
+      output: "\u65B9\u6CD5\u9A8C\u8BC1\u62A5\u544A\uFF0C\u4EE5\u53CA\u5DF2\u9A8C\u8BC1\u4E0E\u672A\u9A8C\u8BC1\u80FD\u529B\u7684\u660E\u786E\u8FB9\u754C\u3002",
+      boundary: "\u5F53\u524D\u6CA1\u6709\u72EC\u7ACB Gold Label\uFF0C\u56E0\u6B64\u4E0D\u80FD\u8BA1\u7B97\u751F\u4EA7\u8BCA\u65AD\u51C6\u786E\u7387\u3002",
+      caseIds: ["RCA-EXT-001", "RCA-EXT-002", "RCA-EXT-003", "RCA-EXT-004", "RCA-EXT-005", "RCA-EXT-006", "RCA-EXT-007", "RCA-EXT-008", "RCA-EXT-009", "RCA-EXT-010"],
+      caseFinding: "10 \u4E2A\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B\u8986\u76D6 ACC\u3001FCW\u3001AEB/AWB \u548C LCC\u3002\u7EDF\u4E00\u95E8\u7981\u5F97\u5230 4 \u6848\u53D7\u9650\u5019\u9009\u30016 \u6848\u7EC8\u6B62\u6027\u505C\u7B54\uFF0C\u5E76\u8BC6\u522B 2 \u6848\u8BC1\u636E\u5F20\u529B\u548C 1 \u6848\u5B89\u5168\u4F18\u5148\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-OBS-001", "EV-RCA-EXT-008-OBS-002", "EV-RCA-EXT-010-OBS-008"],
+      caseHandling: "\u72EC\u7ACB\u9A8C\u8BC1\u5668\u68C0\u67E5\u91CD\u590D\u8FD0\u884C\u4E00\u81F4\u6027\u3001Evidence ID \u6709\u6548\u6027\u3001\u7981\u7528\u7ED3\u8BBA\u548C\u7F3A\u5931\u5B57\u6BB5\u53D8\u5F02\uFF0C\u9A8C\u8BC1\u65B9\u6CD5\u662F\u5426\u7A33\u5B9A\u5B88\u4F4F\u8FB9\u754C\u3002",
+      caseConclusion: "\u5DF2\u9A8C\u8BC1\u7684\u662F\u771F\u5B9E\u6570\u636E\u4E0B\u7684\u8BC1\u636E\u7F16\u6392\u3001\u5206\u6D41\u3001\u505C\u7B54\u548C\u8D8A\u754C\u63A7\u5236\u3002",
+      caseNonClaim: "4/6 \u662F\u89C4\u5219\u8986\u76D6\u7ED3\u679C\uFF0C\u4E0D\u662F\u8BCA\u65AD\u51C6\u786E\u7387\uFF1B\u6CA1\u6709 Gold Label \u5C31\u4E0D\u80FD\u8BA1\u7B97\u51C6\u786E\u7387\u3001\u53EC\u56DE\u7387\u6216\u6CDB\u5316\u80FD\u529B\u3002"
+    },
+    {
+      id: "historical-knowledge",
+      requirementId: "R11",
+      shortTitle: "\u5386\u53F2\u6848\u4F8B\u53EA\u80FD\u53C2\u8003\uFF0C\u4E0D\u80FD\u7167\u642C",
+      problem: "\u5386\u53F2\u6848\u4F8B\u5E0C\u671B\u5E2E\u52A9\u65B0 Case\uFF0C\u4F46\u4E0D\u80FD\u628A\u65E7\u7ED3\u8BBA\u76F4\u63A5\u8FC1\u79FB\u8FC7\u6765\u3002",
+      explanation: "\u8868\u9762\u76F8\u4F3C\u7684\u5F02\u5E38\u53EF\u80FD\u6709\u4E0D\u540C\u573A\u666F\u548C\u4E0D\u540C\u8BC1\u636E\u6761\u4EF6\uFF0C\u76F4\u63A5\u590D\u5236\u5386\u53F2\u6839\u56E0\u4F1A\u5F62\u6210\u65B0\u7684\u8BEF\u5224\u3002",
+      method: "G3 \u5386\u53F2\u53C2\u8003 + G7 \u77E5\u8BC6\u6C89\u6DC0 + \u65B0\u6570\u636E\u5206\u8BCA",
+      methodDetail: "\u4EC5\u5F15\u7528\u5386\u53F2\u6848\u4F8B\u7684\u9002\u7528\u6761\u4EF6\u3001\u9A8C\u8BC1\u65B9\u6CD5\u548C\u53CD\u4F8B\uFF1B\u65B0 Case \u4ECD\u91CD\u65B0\u8D70\u5F53\u524D\u8BC1\u636E\u94FE\uFF0C\u5E76\u6309\u5F71\u54CD\u8303\u56F4\u6700\u5C0F\u91CD\u8DD1\u3002",
+      skills: [
+        { name: "autoguard-closure-capa", role: "\u628A\u5DF2\u5173\u95ED\u6848\u4F8B\u6C89\u6DC0\u4E3A\u53D7\u6761\u4EF6\u7EA6\u675F\u7684\u77E5\u8BC6\u3002" },
+        { name: "autoguard-new-data-triage", role: "\u5224\u65AD\u65B0\u589E\u6570\u636E\u5F71\u54CD\u54EA\u4E9B\u5DE5\u4EF6\u5E76\u6700\u5C0F\u91CD\u8DD1\u3002" }
+      ],
+      output: "\u53EA\u8BFB\u5386\u53F2\u53C2\u8003\u3001\u5DEE\u5F02\u9879\u3001\u53EF\u590D\u7528\u9A8C\u8BC1\u65B9\u6CD5\u548C\u6700\u5C0F\u91CD\u8DD1\u8303\u56F4\u3002",
+      boundary: "\u5F53\u524D\u6CA1\u6709\u771F\u5B9E\u5173\u95ED\u4E0E\u4FEE\u590D\u7EC8\u6001\uFF0C\u5C1A\u4E0D\u80FD\u8BC1\u660E\u5386\u53F2\u77E5\u8BC6\u5DF2\u63D0\u9AD8\u771F\u5B9E\u8BCA\u65AD\u6548\u679C\u3002",
+      caseIds: ["RCA-EXT-001", "RCA-EXT-010"],
+      caseFinding: "\u4E24\u6848\u90FD\u5C5E\u4E8E ACC \u8DDF\u8F66\u51CF\u901F\u95EE\u9898\uFF1ARCA-EXT-001 \u5F62\u6210 4 \u4E2A\u53D7\u9650\u5019\u9009\uFF0CRCA-EXT-010 \u5219\u56E0\u62A5\u544A\u201C\u987F\u632B/\u70B9\u5934\u201D\u4E0E jerk \u672A\u89C2\u5BDF\u5230\u5F02\u5E38\u5F62\u6210\u8BC1\u636E\u5F20\u529B\u5E76\u505C\u7B54\u3002",
+      caseEvidenceIds: ["EV-RCA-EXT-001-OBS-003", "EV-RCA-EXT-010-CLAIM-001", "EV-RCA-EXT-010-OBS-008"],
+      caseHandling: "\u5386\u53F2\u6848\u4F8B\u53EA\u63D0\u4F9B\u53EF\u68C0\u67E5\u673A\u5236\u3001\u53CD\u4F8B\u548C\u7F3A\u5931\u6761\u4EF6\uFF1B\u65B0 Case \u5FC5\u987B\u91CD\u5EFA\u81EA\u5DF1\u7684\u8BC1\u636E\u94FE\uFF0C\u4E0D\u80FD\u590D\u5236\u65E7\u7ED3\u8BBA\u3002",
+      caseConclusion: "\u771F\u5B9E\u6848\u4F8B\u5DF2\u7ECF\u8BC1\u660E\u201C\u8868\u9762\u76F8\u4F3C\u201D\u4E0D\u80FD\u51B3\u5B9A\u76F8\u540C\u5904\u7406\u8DEF\u5F84\uFF0C\u5386\u53F2\u77E5\u8BC6\u53EA\u80FD\u4F5C\u4E3A\u53D7\u6761\u4EF6\u7EA6\u675F\u7684\u53C2\u8003\u3002",
+      caseNonClaim: "\u5F53\u524D\u6CA1\u6709\u771F\u5B9E\u4FEE\u590D\u548C\u5173\u95ED\u7EC8\u6001\uFF0C\u4E0D\u80FD\u58F0\u79F0\u5386\u53F2\u6848\u4F8B\u5DF2\u63D0\u5347\u8BCA\u65AD\u51C6\u786E\u7387\u6216\u4FEE\u590D\u6548\u7387\u3002"
+    }
+  ];
+  const ANALYSIS_LABELS = {
+    LIMITED_CANDIDATES_READY: "\u53D7\u9650\u5019\u9009\u5F85\u5BA1\u6838",
+    TERMINAL_STOP: "\u7EC8\u6B62\u6027\u505C\u7B54"
+  };
+  const OBSERVATION_LABELS = {
+    supporting_observation: "\u652F\u6301\u65B9\u5411",
+    counter_evidence: "\u53CD\u8BC1",
+    missing_evidence: "\u5B57\u6BB5\u4E0D\u8DB3"
+  };
+  const MEASUREMENT_STATUS_LABELS = {
+    NOT_EXECUTABLE_WITH_CURRENT_DATA: "\u5F53\u524D\u6570\u636E\u4E0D\u53EF\u6267\u884C"
+  };
+  const RESPONSIBILITY_STATUS_LABELS = {
+    UNDETERMINED_WITH_CURRENT_DATA: "\u5F53\u524D\u6570\u636E\u4E0D\u53EF\u5224\u5B9A"
+  };
+  const ROUTE_STATUS_LABELS = {
+    VERIFIED_METHOD_BEHAVIOR: "\u771F\u5B9E\u6570\u636E\u5DF2\u9A8C\u8BC1\u65B9\u6CD5\u884C\u4E3A",
+    PARTIALLY_VERIFIED: "\u95E8\u7981\u5DF2\u9A8C\u8BC1\uFF0C\u4F01\u4E1A\u6267\u884C\u5F85\u63A5\u5165",
+    NOT_ASSESSED: "\u5F53\u524D\u4F01\u4E1A\u6570\u636E\u672A\u8986\u76D6",
+    NOT_EVALUABLE_WITH_CURRENT_DATA: "\u5F53\u524D\u6570\u636E\u4E0D\u53EF\u8BC4\u4F30",
+    METHOD_DEFINED_NOT_MEASURED: "\u65B9\u6CD5\u5DF2\u5B9A\u4E49\uFF0C\u5F85\u4F01\u4E1A\u5B9E\u6D4B",
+    READY_FOR_ENTERPRISE_OPERATION: "\u5DF2\u5177\u5907\u4F01\u4E1A\u6267\u884C\u5DE5\u4EF6"
+  };
+  const ROUTE_NODE_DETAILS = {
+    G1_PROBLEM_INTAKE: "\u628A\u62A5\u544A\u9648\u8FF0\u3001\u89C2\u5BDF\u3001\u5047\u8BBE\u3001\u671F\u671B\u548C\u672A\u77E5\u9879\u5206\u5F00\uFF0C\u5148\u56DE\u7B54\u53D1\u751F\u4E86\u4EC0\u4E48\u3002",
+    G2_EVIDENCE_FREEZE: "\u6309 Case \u6C47\u805A\u591A\u7CFB\u7EDF\u6750\u6599\uFF0C\u51BB\u7ED3 Evidence ID\u3001\u54C8\u5E0C\u548C\u7248\u672C\u3002",
+    G3_CANDIDATE_ANALYSIS: "AI \u53EA\u7ED9\u53D7\u9650\u5019\u9009\u3001\u652F\u6301\u3001\u53CD\u8BC1\u3001\u7F3A\u5931\u548C\u505C\u7B54\u6761\u4EF6\u3002",
+    G4_ENTERPRISE_REVIEW: "\u6709\u6743\u9650\u7684\u4F01\u4E1A\u8D23\u4EFB\u4EBA\u5BA1\u6838\u8BC1\u636E\u8FB9\u754C\u548C\u4E0B\u4E00\u6B65\u52A8\u4F5C\u3002",
+    G5_VALIDATION_PROTOCOL: "\u9884\u5148\u51BB\u7ED3\u57FA\u7EBF\u3001\u5E72\u9884\u3001\u5BF9\u7167\u3001\u5224\u636E\u548C\u505C\u6B62\u89C4\u5219\u3002",
+    G6_ENGINEERING_RESULT: "\u5DE5\u7A0B\u7ED3\u679C\u53EA\u5141\u8BB8\u652F\u6301\u3001\u8BC1\u4F2A\u3001\u4E0D\u786E\u5B9A\u6216\u4E0D\u53EF\u8BC4\u4F30\u3002",
+    G7_CAPA_CLOSURE: "\u6709\u4FEE\u590D\u3001\u56DE\u5F52\u3001\u6548\u679C\u548C\u5173\u95ED\u4E8B\u5B9E\u540E\uFF0C\u624D\u6C89\u6DC0\u53EF\u590D\u7528\u77E5\u8BC6\u3002"
+  };
+  const METHOD_ROUTE_FALLBACK = {
+    summary: {
+      requirement_count: 11,
+      mainline_stage_count: 7,
+      mainline_state: "ACTIVE_WITH_BOUNDED_STOPS",
+      optional_branch_missing_blocks_mainline: false,
+      vehicle_side_role: "LOG_AND_EVENT_INDEX_TRANSFER_ONLY"
+    },
+    requirements: [
+      ["R1", "\u5148\u8FD8\u539F\u53D1\u751F\u4E86\u4EC0\u4E48\uFF0C\u518D\u8BA8\u8BBA\u539F\u56E0", ["G1_PROBLEM_INTAKE"], "VERIFIED_METHOD_BEHAVIOR"],
+      ["R2", "\u591A\u7CFB\u7EDF\u6750\u6599\u56F4\u7ED5\u540C\u4E00 Case \u7EC4\u7EC7", ["G2_EVIDENCE_FREEZE"], "VERIFIED_METHOD_BEHAVIOR"],
+      ["R3", "\u591A\u79CD\u89E3\u91CA\u4E0D\u80FD\u76F4\u63A5\u5B9A\u56E0", ["G3_CANDIDATE_ANALYSIS"], "VERIFIED_METHOD_BEHAVIOR"],
+      ["R4", "OTA \u540E\u5F02\u5E38\u4E0D\u80FD\u76F4\u63A5\u5F52\u56E0 OTA", ["G3_OTA_GATE"], "NOT_ASSESSED"],
+      ["R5", "AI \u8BCA\u65AD\u5FC5\u987B\u53D7\u4EBA\u5DE5\u76D1\u7763", ["G4_ENTERPRISE_REVIEW"], "PARTIALLY_VERIFIED"],
+      ["R6", "\u590D\u6742\u573A\u666F\u9700\u8981\u770B\u6E05\u4EA4\u4E92\u5173\u7CFB", ["G3_SCENARIO_RECONSTRUCTION"], "NOT_EVALUABLE_WITH_CURRENT_DATA"],
+      ["R7", "\u8F66\u7AEF\u5FC5\u987B\u8F7B\u91CF\u4E14\u4E0D\u5F71\u54CD\u63A7\u5236", ["VEHICLE_LOG_TRANSFER"], "METHOD_DEFINED_NOT_MEASURED"],
+      ["R8", "\u5019\u9009\u5FC5\u987B\u88AB\u5DE5\u7A0B\u9A8C\u8BC1\u548C\u8BC1\u4F2A", ["G5_VALIDATION_PROTOCOL", "G6_ENGINEERING_RESULT"], "PARTIALLY_VERIFIED"],
+      ["R9", "\u8D28\u91CF\u3001\u6CD5\u89C4\u548C\u5185\u90E8\u5BA1\u67E5\u9700\u8981\u5B8C\u6574\u8BC1\u636E\u5305", ["G2_EVIDENCE_FREEZE", "G4_ENTERPRISE_REVIEW", "G6_ENGINEERING_RESULT", "G7_CAPA_CLOSURE"], "VERIFIED_METHOD_BEHAVIOR"],
+      ["R10", "\u5148\u9A8C\u8BC1\u65B9\u6CD5\u53EF\u9760\u6027\uFF0C\u4E0D\u80FD\u5305\u88C5\u6210\u51C6\u786E\u7387", ["M0_METHOD_VALIDATION"], "VERIFIED_METHOD_BEHAVIOR"],
+      ["R11", "\u5386\u53F2\u6848\u4F8B\u5E2E\u52A9\u65B0 Case\uFF0C\u4F46\u4E0D\u80FD\u7167\u642C\u7ED3\u8BBA", ["G3_HISTORY_REFERENCE", "G7_CAPA_CLOSURE"], "NOT_EVALUABLE_WITH_CURRENT_DATA"]
+    ].map(([requirement_id, problem, node_ids, current_status]) => ({ requirement_id, problem, node_ids, current_status })),
+    nodes: [
+      ["VEHICLE_LOG_TRANSFER", "INGRESS", "\u8F66\u7AEF\u53EA\u8BFB\u65E5\u5FD7\u4F20\u8F93", "VEHICLE_BOUNDARY", "METHOD_DEFINED_NOT_MEASURED"],
+      ["G1_PROBLEM_INTAKE", "G1", "\u95EE\u9898\u5B9A\u4E49\u4E0E\u4E8B\u4EF6\u5305", "MAINLINE", "VERIFIED_METHOD_BEHAVIOR"],
+      ["G2_EVIDENCE_FREEZE", "G2", "\u8BC1\u636E\u51BB\u7ED3\u4E0E\u8DE8\u7CFB\u7EDF\u5173\u8054", "MAINLINE", "VERIFIED_METHOD_BEHAVIOR"],
+      ["G3_CANDIDATE_ANALYSIS", "G3", "\u5019\u9009\u3001\u53CD\u8BC1\u3001\u5F20\u529B\u4E0E\u505C\u7B54", "MAINLINE", "VERIFIED_METHOD_BEHAVIOR"],
+      ["G3_SCENARIO_RECONSTRUCTION", "G3", "\u573A\u666F\u91CD\u5EFA\u5206\u652F", "OPTIONAL_PARALLEL_BRANCH", "NOT_EVALUABLE_WITH_CURRENT_DATA"],
+      ["G3_OTA_GATE", "G3", "OTA \u56E0\u679C\u95E8\u7981\u5206\u652F", "OPTIONAL_PARALLEL_BRANCH", "NOT_ASSESSED"],
+      ["G3_HISTORY_REFERENCE", "G3", "\u5386\u53F2\u6848\u4F8B\u53C2\u8003\u5206\u652F", "OPTIONAL_PARALLEL_BRANCH", "NOT_EVALUABLE_WITH_CURRENT_DATA"],
+      ["G4_ENTERPRISE_REVIEW", "G4", "\u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838", "MAINLINE", "PARTIALLY_VERIFIED"],
+      ["G5_VALIDATION_PROTOCOL", "G5", "\u53EF\u8BC1\u4F2A\u9A8C\u8BC1\u534F\u8BAE", "MAINLINE", "PARTIALLY_VERIFIED"],
+      ["G6_ENGINEERING_RESULT", "G6", "\u5DE5\u7A0B\u9A8C\u8BC1\u4E0E\u5DEE\u5206\u7ED3\u679C", "MAINLINE", "NOT_EVALUABLE_WITH_CURRENT_DATA"],
+      ["G7_CAPA_CLOSURE", "G7", "CAPA\u3001\u5173\u95ED\u4E0E\u77E5\u8BC6\u6C89\u6DC0", "MAINLINE", "NOT_EVALUABLE_WITH_CURRENT_DATA"],
+      ["M0_METHOD_VALIDATION", "M0", "\u65B9\u6CD5\u884C\u4E3A\u4E0E\u8D8A\u754C\u9A8C\u8BC1", "ASSURANCE", "VERIFIED_METHOD_BEHAVIOR"],
+      ["NEW_DATA_TRIAGE", "CROSS_STAGE", "\u65B0\u6570\u636E\u5206\u8BCA\u4E0E\u6700\u5C0F\u91CD\u8DD1", "CHANGE_IMPACT_CONTROLLER", "VERIFIED_METHOD_BEHAVIOR"]
+    ].map(([node_id, stage, title, method_role, current_status]) => ({ node_id, stage, title, method_role, current_status })),
+    runtime: { source: "static_initial", degraded: true, reason: "\u6B63\u5728\u8BFB\u53D6\u7EDF\u4E00\u65B9\u6CD5\u8DEF\u7EBF" }
+  };
+  const NEW_DATA_REVIEW_FALLBACK = {
+    data_authority: "ENTERPRISE_PROVIDED_BASELINE_ONLY",
+    new_arrival_data_class: "DEMO_INPUT_SYNTHETIC",
+    demo_boundary: "\u6F14\u793A\u65B0\u589E\u5230\u8FBE\u9879\u4E0D\u5C5E\u4E8E\u4F01\u4E1A\u65B0\u589E\u4E8B\u5B9E\uFF0C\u4E0D\u5199\u5165\u4F01\u4E1A\u6570\u636E\u5305\u3002",
+    baseline: { case_count: 10, evidence_item_count: 146 },
+    scenarios: [],
+    runtime: { source: "static_initial", degraded: true, reason: "\u6B63\u5728\u8BFB\u53D6\u65B0\u6570\u636E\u5BA1\u6838\u6F14\u793A" }
+  };
+  const REVIEW_STATE_LABELS = {
+    ACCEPT_APPEND: "\u63A5\u53D7\u5E76\u8FFD\u52A0",
+    LATE_APPEND_REOPEN: "\u8FDF\u5230\u8FFD\u52A0\u5E76\u91CD\u5F00",
+    CONFLICT_PENDING: "\u51B2\u7A81\u5F85\u5BA1\u6838",
+    DUPLICATE_NOOP: "\u91CD\u590D\u8BB0\u5F55\uFF0C\u4E0D\u91CD\u8DD1",
+    EXCLUDED_NON_ENTERPRISE: "\u6392\u9664\u975E\u4F01\u4E1A\u6570\u636E",
+    SAFETY_HOLD: "\u5B89\u5168\u6682\u505C",
+    REVIEW_REQUIRED: "\u9700\u8981\u5B89\u5168\u590D\u6838",
+    NORMAL: "\u65E0\u65B0\u589E\u5B89\u5168\u52A8\u4F5C",
+    ACCEPT_WITH_TIME_LIMIT: "\u5E26\u65F6\u95F4\u9650\u5236\u63A5\u53D7",
+    CONFLICT_SET_CREATED: "\u5DF2\u5EFA\u7ACB\u51B2\u7A81\u96C6"
+  };
+  function App() {
+    const fallback = window.AUTOGUARD_REAL_RCA_WORKBENCH || { metrics: {}, boundaries: {}, cases: [] };
+    const [source, setSource] = React.useState(fallback);
+    const [enterpriseRoute, setEnterpriseRoute] = React.useState(METHOD_ROUTE_FALLBACK);
+    const [newDataReview, setNewDataReview] = React.useState(NEW_DATA_REVIEW_FALLBACK);
+    const [page, setPage] = React.useState("demo");
+    const [mode, setMode] = React.useState("story");
+    const [activeId, setActiveId] = React.useState("RCA-EXT-005");
+    const [stepId, setStepId] = React.useState(window.AutoGuardPresentation.STORY_STEPS[0].id);
+    const [query, setQuery] = React.useState("");
+    React.useEffect(() => {
+      let mounted = true;
+      const client = window.AutoGuardAgentClient;
+      if (!client) return void 0;
+      client.loadWorkbench(window.fetch?.bind(window), fallback).then((payload) => {
+        if (mounted && payload?.cases?.length) setSource(payload);
+      });
+      client.loadMethodRoute(window.fetch?.bind(window), METHOD_ROUTE_FALLBACK).then((payload) => {
+        if (mounted && payload?.requirements?.length === 11) setEnterpriseRoute(payload);
+      });
+      client.loadNewDataReviewDemo(window.fetch?.bind(window), NEW_DATA_REVIEW_FALLBACK).then((payload) => {
+        if (mounted && payload?.scenarios?.length) setNewDataReview(payload);
+      });
+      return () => {
+        mounted = false;
+      };
+    }, []);
+    const cases = source.cases || [];
+    const activeCase = cases.find((item) => item.case_id === activeId) || cases[0];
+    const visibleCases = cases.filter((item) => !query.trim() || `${item.case_id} ${item.title} ${item.domain}`.toLowerCase().includes(query.trim().toLowerCase()));
+    function selectCase(caseId) {
+      setActiveId(caseId);
+      setStepId(window.AutoGuardPresentation.STORY_STEPS[0].id);
+      setPage("cases");
+    }
+    if (!activeCase) return /* @__PURE__ */ React.createElement("div", { className: "empty-state" }, "\u771F\u5B9E\u6848\u4F8B\u5DE5\u4F5C\u53F0\u6570\u636E\u5C1A\u672A\u751F\u6210\u3002");
+    return page === "demo" ? /* @__PURE__ */ React.createElement("div", { className: "app-shell focused-demo-shell" }, /* @__PURE__ */ React.createElement(FocusedDemoHeader, { onOpenWorkbench: () => setPage("overview") }), /* @__PURE__ */ React.createElement("main", { className: "focused-demo-main" }, /* @__PURE__ */ React.createElement(DemoWorkspace, { caseItem: activeCase, cases }))) : /* @__PURE__ */ React.createElement("div", { className: "app-shell" }, /* @__PURE__ */ React.createElement(Header, { source, page }), /* @__PURE__ */ React.createElement("div", { className: "workspace-layout" }, /* @__PURE__ */ React.createElement(
+      Sidebar,
+      {
+        page,
+        onPageChange: setPage,
+        cases: visibleCases,
+        activeId: activeCase.case_id,
+        query,
+        onQueryChange: setQuery,
+        onSelect: selectCase
+      }
+    ), /* @__PURE__ */ React.createElement("main", { className: "workspace-main" }, page === "overview" && /* @__PURE__ */ React.createElement(OverviewWorkspace, { source, onOpenCase: selectCase }), page === "cases" && /* @__PURE__ */ React.createElement(
+      CaseWorkspace,
+      {
+        caseItem: activeCase,
+        mode,
+        onModeChange: setMode,
+        stepId,
+        onStepChange: setStepId
+      }
+    ), page === "method" && /* @__PURE__ */ React.createElement(MethodWorkspace, { source, enterpriseRoute }), page === "newData" && /* @__PURE__ */ React.createElement(NewDataReviewWorkspace, { source, reviewDemo: newDataReview }))));
+  }
+  function FocusedDemoHeader({ onOpenWorkbench }) {
+    return /* @__PURE__ */ React.createElement("header", { className: "focused-demo-header" }, /* @__PURE__ */ React.createElement("div", { className: "brand-lockup" }, /* @__PURE__ */ React.createElement("span", { className: "brand-mark", "aria-hidden": "true" }, "AG"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "AutoGuard"), /* @__PURE__ */ React.createElement("span", null, "\u65E0\u4EBA\u8F66\u5F02\u5E38\u884C\u4E3A\u6392\u67E5\u5DE5\u5177\u7BB1"))), /* @__PURE__ */ React.createElement("button", { type: "button", className: "focused-workbench-link", onClick: onOpenWorkbench }, "\u8FDB\u5165\u5B8C\u6574\u5DE5\u4F5C\u53F0"));
+  }
+  function Header({ source, page }) {
+    return /* @__PURE__ */ React.createElement("header", { className: "topbar" }, /* @__PURE__ */ React.createElement("div", { className: "brand-lockup" }, /* @__PURE__ */ React.createElement("span", { className: "brand-mark", "aria-hidden": "true" }, "AG"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "AutoGuard"), /* @__PURE__ */ React.createElement("span", null, "\u65E0\u4EBA\u8F66\u5F02\u5E38\u884C\u4E3A\u6392\u67E5\u5DE5\u5177\u7BB1"))), /* @__PURE__ */ React.createElement("div", { className: "page-context" }, /* @__PURE__ */ React.createElement("span", null, "OTA \u540E\u884C\u4E3A\u9000\u5316 \xB7 \u8BC1\u636E\u9A71\u52A8\u65B9\u6CD5"), /* @__PURE__ */ React.createElement("strong", null, PAGE_LABELS[page])), /* @__PURE__ */ React.createElement("div", { className: "topbar-metrics", "aria-label": "\u6570\u636E\u8FB9\u754C" }, /* @__PURE__ */ React.createElement(Metric, { label: "\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B", value: source.metrics?.case_count ?? 10 }), /* @__PURE__ */ React.createElement(Metric, { label: "\u6570\u636E\u6765\u6E90\u5BA1\u8BA1", value: "\u901A\u8FC7", tone: "green" }), /* @__PURE__ */ React.createElement(Metric, { label: "\u539F\u59CB MCAP", value: "\u672A\u63D0\u4F9B", tone: "amber" })));
+  }
+  function Metric({ label, value, tone = "" }) {
+    return /* @__PURE__ */ React.createElement("div", { className: `metric ${tone}` }, /* @__PURE__ */ React.createElement("span", null, label), /* @__PURE__ */ React.createElement("strong", null, value));
+  }
+  function Sidebar({ page, onPageChange, cases, activeId, query, onQueryChange, onSelect }) {
+    const navNumbers = { demo: "01", overview: "02", cases: "03", method: "04", newData: "05" };
+    return /* @__PURE__ */ React.createElement("aside", { className: "sidebar", "aria-label": "\u5DE5\u4F5C\u53F0\u5BFC\u822A" }, /* @__PURE__ */ React.createElement("nav", { className: "primary-nav" }, Object.entries(PAGE_LABELS).map(([id, label]) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        key: id,
+        className: page === id ? "active" : "",
+        onClick: () => onPageChange(id)
+      },
+      /* @__PURE__ */ React.createElement("span", { className: "nav-mark", "aria-hidden": "true" }, navNumbers[id]),
+      /* @__PURE__ */ React.createElement("span", null, label)
+    ))), /* @__PURE__ */ React.createElement("div", { className: `case-browser ${page === "cases" ? "visible" : ""}` }, /* @__PURE__ */ React.createElement("div", { className: "queue-head" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "\u771F\u5B9E\u6848\u4F8B"), /* @__PURE__ */ React.createElement("span", null, cases.length, " \u4E2A\u7ED3\u679C")), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "search",
+        value: query,
+        onChange: (event) => onQueryChange(event.target.value),
+        placeholder: "\u641C\u7D22\u6848\u4F8B\u6216\u529F\u80FD\u57DF",
+        "aria-label": "\u641C\u7D22\u6848\u4F8B"
+      }
+    )), /* @__PURE__ */ React.createElement("div", { className: "case-list" }, cases.map((item) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        key: item.case_id,
+        className: `case-row ${item.case_id === activeId ? "active" : ""}`,
+        onClick: () => onSelect(item.case_id)
+      },
+      /* @__PURE__ */ React.createElement("span", { className: "case-row-top" }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, item.case_id), /* @__PURE__ */ React.createElement("b", null, item.domain)),
+      /* @__PURE__ */ React.createElement("strong", null, item.title),
+      /* @__PURE__ */ React.createElement("small", { className: stateTone(item) }, ANALYSIS_LABELS[item.analysis_state])
+    )))), /* @__PURE__ */ React.createElement("div", { className: "sidebar-boundary" }, /* @__PURE__ */ React.createElement("strong", null, "\u7ED3\u8BBA\u8FB9\u754C"), /* @__PURE__ */ React.createElement("span", null, "\u89C4\u5219\u8986\u76D6\uFF0C\u4E0D\u662F\u8BCA\u65AD\u51C6\u786E\u7387")));
+  }
+  const CAMPUS_DEMO_STEPS = [
+    {
+      id: "define",
+      number: "01",
+      title: "\u5148\u5B9A\u4E49\u95EE\u9898\uFF0C\u518D\u8C08\u539F\u56E0",
+      question: "\u4F01\u4E1A\u63CF\u8FF0\u7684\u662F\u201C\u529F\u80FD\u6CA1\u6709\u6309\u9884\u671F\u9000\u51FA\u201D\uFF0C\u8FD8\u662F\u5DF2\u7ECF\u8BC1\u660E\u4E86\u67D0\u4E2A\u6A21\u5757\u5931\u6548\uFF1F",
+      method: "G1 \u95EE\u9898\u5B9A\u4E49\u4E0E\u4E8B\u4EF6\u5305",
+      skill: "autoguard-intake",
+      action: "\u628A\u4F01\u4E1A\u62A5\u544A\u3001\u53EF\u89C2\u5BDF\u4E8B\u5B9E\u3001\u671F\u671B\u884C\u4E3A\u548C\u672A\u77E5\u9879\u5206\u5F00\uFF0C\u5148\u9501\u5B9A\u95EE\u9898\u8303\u56F4\u3002",
+      output: "\u95EE\u9898\u5B9A\u4E49\uFF1A\u538B\u5408\u6D41\u7EBF LCC \u672A\u9000\u51FA\uFF1B\u5F85\u786E\u8BA4\uFF1A\u9000\u51FA\u6761\u4EF6\u3001\u8F66\u8F86\u8F68\u8FF9\u548C\u5F53\u65F6\u89C4\u5219\u3002",
+      evidence: ["EV-RCA-EXT-005-CLAIM-001", "EV-RCA-EXT-005-OBS-001"]
+    },
+    {
+      id: "freeze",
+      number: "02",
+      title: "\u628A\u5206\u6563\u7EBF\u7D22\u51BB\u7ED3\u6210\u4E00\u6761\u8BC1\u636E\u94FE",
+      question: "\u65E5\u5FD7\u3001\u89C2\u5BDF\u548C\u7F3A\u5931\u5B57\u6BB5\uFF0C\u80FD\u4E0D\u80FD\u6307\u56DE\u540C\u4E00\u4E2A Case \u548C\u540C\u4E00\u4EFD\u5FEB\u7167\uFF1F",
+      method: "G2 \u8BC1\u636E\u51BB\u7ED3\u4E0E\u8DE8\u7CFB\u7EDF\u5173\u8054",
+      skill: "autoguard-evidence-chain",
+      action: "\u4E3A\u6BCF\u9879\u6750\u6599\u5EFA\u7ACB Evidence ID\uFF0C\u6807\u6CE8\u5B83\u662F\u4F01\u4E1A\u9648\u8FF0\u3001\u652F\u6301\u89C2\u5BDF\u8FD8\u662F\u5B57\u6BB5\u4E0D\u8DB3\u3002",
+      output: "\u4F01\u4E1A\u53EF\u4EE5\u56DE\u770B\u6BCF\u4E2A\u5224\u65AD\u7684\u6765\u6E90\uFF0C\u5E76\u77E5\u9053\u4E0B\u4E00\u6B65\u7F3A\u4EC0\u4E48\uFF0C\u800C\u4E0D\u662F\u53EA\u770B\u5230\u4E00\u6BB5 AI \u6587\u5B57\u3002",
+      evidence: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-OBS-003", "EV-RCA-EXT-005-OBS-005"]
+    },
+    {
+      id: "candidate",
+      number: "03",
+      title: "\u628A\u590D\u6742\u4EA4\u4E92\u53D8\u6210\u53D7\u9650\u5019\u9009",
+      question: "\u8F66\u9053\u51E0\u4F55\u3001\u529F\u80FD\u72B6\u6001\u548C\u53C2\u4E0E\u8005\u5173\u7CFB\uFF0C\u54EA\u4E00\u9879\u771F\u6B63\u80FD\u533A\u5206\u4E0D\u540C\u89E3\u91CA\uFF1F",
+      method: "G3 \u573A\u666F\u91CD\u5EFA\u5206\u652F + \u53D7\u9650\u5019\u9009\u5206\u6790",
+      skill: "autoguard-scenario-reconstruction + autoguard-candidate-analysis",
+      action: "\u53EA\u8FD8\u539F\u5F53\u524D\u6570\u636E\u80FD\u652F\u6301\u7684\u8F66\u9053\u51E0\u4F55\u7EBF\u7D22\uFF1B\u628A\u65E0\u6CD5\u786E\u8BA4\u7684\u8F68\u8FF9\u3001\u4EA4\u4E92\u548C\u9000\u51FA\u6761\u4EF6\u4FDD\u7559\u4E3A\u7F3A\u53E3\u3002",
+      output: "\u53D7\u9650\u5019\u9009\uFF1A\u201C\u8F66\u9053\u51E0\u4F55\u5F02\u5E38\u201D\u53EF\u80FD\u5F71\u54CD\u5224\u65AD\uFF1B\u4E0D\u662F\u201CLCC \u672A\u9000\u51FA\u7684\u6839\u56E0\u201D\u3002",
+      evidence: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-MISSING-ENTITY-CONTINUITY", "EV-RCA-EXT-005-MISSING-HANDOVER-SEQUENCE"]
+    },
+    {
+      id: "review",
+      number: "04",
+      title: "\u8BA9\u4F01\u4E1A\u4EBA\u5458\u5BA1\u6838\u4E0B\u4E00\u6B65\u52A8\u4F5C",
+      question: "AI \u751F\u6210\u7684\u662F\u65B9\u5411\uFF0C\u4F01\u4E1A\u662F\u5426\u6279\u51C6\u7EE7\u7EED\u8865\u8BC1\u6216\u8FDB\u5165\u9A8C\u8BC1\uFF1F",
+      method: "G4 \u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838",
+      skill: "autoguard-human-review",
+      action: "\u4EBA\u5DE5\u6838\u5BF9\u5019\u9009\u3001\u652F\u6301\u8BC1\u636E\u3001\u53CD\u8BC1\u548C\u7F3A\u5931\u9879\uFF0C\u53EA\u6279\u51C6\u8865\u8BC1\u3001\u505C\u7B54\u6216\u9A8C\u8BC1\u52A8\u4F5C\u3002",
+      output: "\u5BA1\u6838\u51B3\u5B9A\u6709\u8BC1\u636E\u4F9D\u636E\u548C\u5931\u6548\u6761\u4EF6\uFF1B\u4EBA\u5DE5\u4E0D\u66FF AI \u6279\u51C6\u751F\u4EA7\u6839\u56E0\u3002",
+      evidence: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-MISSING-RAW-MCAP", "EV-RCA-EXT-005-MISSING-TIME-COORDINATE"]
+    },
+    {
+      id: "validate",
+      number: "05",
+      title: "\u628A\u65B9\u5411\u53D8\u6210\u53EF\u8BC1\u4F2A\u7684\u5DE5\u7A0B\u4EFB\u52A1",
+      question: "\u7814\u53D1\u4E0B\u4E00\u6B65\u62FF\u4EC0\u4E48\u6570\u636E\u3001\u505A\u4EC0\u4E48\u5BF9\u7167\uFF0C\u624D\u80FD\u8BC1\u660E\u6216\u6392\u9664\u8FD9\u4E2A\u5019\u9009\uFF1F",
+      method: "G5 \u9A8C\u8BC1\u534F\u8BAE",
+      skill: "autoguard-validation-case",
+      action: "\u51BB\u7ED3\u57FA\u7EBF\u3001\u5355\u4E00\u5E72\u9884\u3001\u5BF9\u7167\u6307\u6807\u548C\u505C\u6B62\u89C4\u5219\uFF1B\u5F53\u524D\u6570\u636E\u4E0D\u8DB3\u65F6\u660E\u786E\u201C\u5C1A\u4E0D\u53EF\u6267\u884C\u201D\u3002",
+      output: "\u4F01\u4E1A\u5F97\u5230\u9A8C\u8BC1\u524D\u63D0\u548C\u4EFB\u52A1\u7ED3\u6784\uFF0C\u800C\u4E0D\u662F\u5047\u60F3\u7684\u590D\u73B0\u7ED3\u679C\u6216\u4FEE\u590D\u5EFA\u8BAE\u3002",
+      evidence: ["EV-RCA-EXT-005-OBS-001", "EV-RCA-EXT-005-MISSING-RAW-MCAP", "EV-RCA-EXT-005-MISSING-TIME-COORDINATE"]
+    }
+  ];
+  function CampusChallenge() {
+    const challenges = [
+      ["\u5F02\u5E38\u96BE\u8FD8\u539F", "\u5F02\u5E38\u5F80\u5F80\u53D1\u751F\u5728\u51E0\u79D2\u5185\uFF0C\u53EA\u6709\u201C\u8F66\u8F86\u7A81\u7136\u505C\u4F4F\u201D\u4E00\u53E5\u8BDD\uFF0C\u5F88\u96BE\u5224\u65AD\u8FC7\u7A0B\u3002"],
+      ["\u7EBF\u7D22\u8F83\u5206\u6563", "\u8F66\u8F86\u72B6\u6001\u3001\u9053\u8DEF\u73AF\u5883\u3001\u884C\u4EBA\u6216\u7535\u52A8\u8F66\u3001\u76EE\u6807\u8DDD\u79BB\u548C\u98CE\u9669\u7B49\u7EA7\u5206\u6563\u5728\u4E0D\u540C\u8BB0\u5F55\u4E2D\u3002"],
+      ["\u5224\u65AD\u9700\u8C28\u614E", "\u8F66\u8F86\u505C\u6B62\u53EF\u80FD\u662F\u5408\u7406\u907F\u8BA9\uFF0C\u4E5F\u53EF\u80FD\u4E0E\u8BC6\u522B\u3001\u51B3\u7B56\u6216\u63A7\u5236\u5F02\u5E38\u6709\u5173\uFF0C\u4E0D\u80FD\u76F4\u63A5\u4E0B\u7ED3\u8BBA\u3002"],
+      ["\u5C55\u793A\u4E0D\u76F4\u89C2", "\u53EA\u770B\u6587\u5B57\u5F88\u96BE\u8BA9\u7814\u53D1\u548C\u4F01\u4E1A\u4EBA\u5458\u5FEB\u901F\u7406\u89E3\uFF0C\u9700\u8981\u628A\u65F6\u95F4\u3001\u53C2\u4E0E\u8005\u548C\u8BC1\u636E\u5173\u7CFB\u8BB2\u6E05\u695A\u3002"]
+    ];
+    return /* @__PURE__ */ React.createElement("section", { className: "campus-challenge", "aria-label": "\u6821\u56ED\u590D\u6742\u573A\u666F\u95EE\u9898" }, /* @__PURE__ */ React.createElement("div", { className: "campus-challenge-heading" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { className: "campus-kicker" }, "\u5E94\u7528\u573A\u666F \xB7 \u95EE\u9898\u6765\u6E90"), /* @__PURE__ */ React.createElement("h2", null, "\u6821\u56ED\u590D\u6742\u73AF\u5883\uFF0C\u4E3A\u4EC0\u4E48\u4E0D\u80FD\u76F4\u63A5\u7ED9\u7B54\u6848\uFF1F")), /* @__PURE__ */ React.createElement("span", { className: "campus-provenance" }, "\u6821\u56ED\u662F\u5E94\u7528\u573A\u666F\uFF0C\u4E0D\u662F\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B")), /* @__PURE__ */ React.createElement("p", { className: "campus-challenge-lead" }, "\u6821\u56ED\u3001\u56ED\u533A\u548C\u5F00\u653E\u9053\u8DEF\u6709\u76F8\u540C\u7684\u590D\u6742\u6027\uFF1A\u53C2\u4E0E\u8005\u591A\u3001\u89C4\u5219\u4F1A\u53D8\u5316\u3001\u906E\u6321\u548C\u8F68\u8FF9\u7F3A\u5931\u4F1A\u540C\u65F6\u51FA\u73B0\u3002\u4F01\u4E1A\u771F\u6B63\u9700\u8981\u7684\u4E0D\u662F\u201C\u731C\u4E00\u4E2A\u539F\u56E0\u201D\uFF0C\u800C\u662F\u628A\u6DF7\u4E71\u73B0\u573A\u53D8\u6210\u53EF\u5BA1\u6838\u3001\u53EF\u9A8C\u8BC1\u7684\u6392\u67E5\u65B9\u5411\u3002"), /* @__PURE__ */ React.createElement("div", { className: "campus-challenge-grid" }, challenges.map(([title, text], index) => /* @__PURE__ */ React.createElement("div", { className: "campus-challenge-item", key: title }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, "0", index + 1), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, title), /* @__PURE__ */ React.createElement("p", null, text))))));
+  }
+  function MethodStep({ step }) {
+    return /* @__PURE__ */ React.createElement("article", { className: "campus-method-step" }, /* @__PURE__ */ React.createElement("div", { className: "campus-method-step-index" }, step.number), /* @__PURE__ */ React.createElement("div", { className: "campus-method-step-content" }, /* @__PURE__ */ React.createElement("span", { className: "campus-kicker" }, step.method), /* @__PURE__ */ React.createElement("h3", null, step.title), /* @__PURE__ */ React.createElement("p", { className: "campus-method-question" }, step.question), /* @__PURE__ */ React.createElement("div", { className: "campus-method-action" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u6211\u4EEC\u600E\u4E48\u505A"), /* @__PURE__ */ React.createElement("p", null, step.action)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u5F97\u5230\u4EC0\u4E48"), /* @__PURE__ */ React.createElement("p", null, step.output))), /* @__PURE__ */ React.createElement("div", { className: "campus-method-meta" }, /* @__PURE__ */ React.createElement("code", null, step.skill), /* @__PURE__ */ React.createElement("div", { className: "campus-method-evidence" }, step.evidence.map((evidenceId) => /* @__PURE__ */ React.createElement("code", { key: evidenceId }, evidenceId))))));
+  }
+  function CampusRealCaseDemo({ cases = [] }) {
+    const [activeStepId, setActiveStepId] = React.useState(CAMPUS_DEMO_STEPS[0].id);
+    const realCase = cases.find((item) => item.case_id === "RCA-EXT-005");
+    const activeStep = CAMPUS_DEMO_STEPS.find((step) => step.id === activeStepId) || CAMPUS_DEMO_STEPS[0];
+    const enterpriseProblem = realCase?.enterprise?.problem || "\u538B\u5408\u6D41\u7EBF LCC \u672A\u9000\u51FA";
+    return /* @__PURE__ */ React.createElement("section", { className: "campus-real-case-demo", "aria-label": "\u6821\u56ED\u95EE\u9898\u4E0E\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B\u4E3B\u7EBF" }, /* @__PURE__ */ React.createElement("header", { className: "campus-demo-heading" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "3-5 \u5206\u949F\u89C6\u9891\u4E3B\u7EBF"), /* @__PURE__ */ React.createElement("h2", null, "\u4ECE\u6821\u56ED\u590D\u6742\u95EE\u9898\uFF0C\u5230\u4F01\u4E1A\u771F\u5B9E\u6570\u636E\u9A8C\u8BC1\u65B9\u6CD5"), /* @__PURE__ */ React.createElement("p", null, "\u5148\u7528\u6821\u56ED\u573A\u666F\u8BF4\u660E\u95EE\u9898\u4E3A\u4EC0\u4E48\u96BE\uFF0C\u518D\u7528\u4F01\u4E1A\u8131\u654F\u771F\u5B9E\u6570\u636E\u6F14\u793A AutoGuard \u5982\u4F55\u5904\u7406\u3002\u4E24\u8005\u6765\u6E90\u4E0D\u540C\uFF0C\u4F46\u65B9\u6CD5\u94FE\u8DEF\u76F8\u540C\u3002")), /* @__PURE__ */ React.createElement("div", { className: "campus-demo-case-badge" }, /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u8131\u654F\u771F\u5B9E\u6570\u636E"), /* @__PURE__ */ React.createElement("strong", null, "RCA-EXT-005"), /* @__PURE__ */ React.createElement("small", null, "LCC \xB7 \u5F53\u524D\u4EC5\u5F62\u6210\u53D7\u9650\u5019\u9009"))), /* @__PURE__ */ React.createElement(CampusChallenge, null), /* @__PURE__ */ React.createElement("section", { className: "campus-real-case", "aria-label": "\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B" }, /* @__PURE__ */ React.createElement("div", { className: "campus-real-case-heading" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { className: "campus-kicker" }, "\u771F\u5B9E\u6848\u4F8B\u9A8C\u8BC1"), /* @__PURE__ */ React.createElement("h3", null, "\u4F01\u4E1A\u62A5\u544A\uFF1A", enterpriseProblem)), /* @__PURE__ */ React.createElement("span", { className: "campus-case-state" }, "\u53D7\u9650\u5019\u9009\u5F85\u5BA1\u6838")), /* @__PURE__ */ React.createElement("p", null, "\u8FD9\u4E2A\u6848\u4F8B\u4E0D\u662F\u6821\u56ED\u6570\u636E\uFF0C\u800C\u662F\u4F01\u4E1A\u63D0\u4F9B\u7684\u8131\u654F\u771F\u5B9E\u6570\u636E\u3002\u5B83\u7528\u4E8E\u68C0\u9A8C\uFF1A\u9762\u5BF9\u590D\u6742\u573A\u666F\uFF0C\u7CFB\u7EDF\u80FD\u5426\u628A\u6709\u9650\u7EBF\u7D22\u7EC4\u7EC7\u8D77\u6765\uFF0C\u540C\u65F6\u5BF9\u4E0D\u80FD\u8BC1\u660E\u7684\u90E8\u5206\u505C\u4E0B\u6765\u3002"), /* @__PURE__ */ React.createElement("div", { className: "campus-case-facts" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u6570\u636E\u652F\u6301"), /* @__PURE__ */ React.createElement("strong", null, "\u8F66\u9053\u51E0\u4F55\u5F02\u5E38\u65B9\u5411"), /* @__PURE__ */ React.createElement("small", null, "EV-RCA-EXT-005-OBS-001")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u6570\u636E\u7F3A\u53E3"), /* @__PURE__ */ React.createElement("strong", null, "\u8FDE\u7EED\u8F68\u8FF9\u3001\u65F6\u95F4\u5750\u6807\u4E0E\u539F\u59CB MCAP"), /* @__PURE__ */ React.createElement("small", null, "EV-RCA-EXT-005-MISSING-RAW-MCAP")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u5F53\u524D\u7ED3\u8BBA"), /* @__PURE__ */ React.createElement("strong", null, "\u4EC5\u5F62\u6210\u53D7\u9650\u5019\u9009"), /* @__PURE__ */ React.createElement("small", null, "\u4E0D\u80FD\u786E\u8BA4\u751F\u4EA7\u6839\u56E0\u6216 LCC \u672A\u9000\u51FA\u539F\u56E0")))), /* @__PURE__ */ React.createElement("section", { className: "campus-method-route", "aria-label": "AutoGuard \u4E94\u6B65\u65B9\u6CD5" }, /* @__PURE__ */ React.createElement("div", { className: "campus-route-heading" }, /* @__PURE__ */ React.createElement("span", { className: "campus-kicker" }, "\u6838\u5FC3\u65B9\u6CD5"), /* @__PURE__ */ React.createElement("h3", null, "\u540C\u4E00\u4E2A\u771F\u5B9E\u6848\u4F8B\uFF0C\u6CBF\u4E94\u6B65\u94FE\u8DEF\u5904\u7406")), /* @__PURE__ */ React.createElement("nav", { className: "campus-step-tabs", role: "tablist", "aria-label": "\u6838\u5FC3\u65B9\u6CD5\u6B65\u9AA4" }, CAMPUS_DEMO_STEPS.map((step) => /* @__PURE__ */ React.createElement("button", { type: "button", role: "tab", "aria-selected": activeStep.id === step.id, className: activeStep.id === step.id ? "active" : "", key: step.id, onClick: () => setActiveStepId(step.id) }, /* @__PURE__ */ React.createElement("span", null, step.number), /* @__PURE__ */ React.createElement("strong", null, step.title)))), /* @__PURE__ */ React.createElement(MethodStep, { step: activeStep })), /* @__PURE__ */ React.createElement("footer", { className: "campus-demo-takeaway" }, /* @__PURE__ */ React.createElement("strong", null, "\u8FD9\u4E00\u6BB5\u8981\u8BB2\u6E05\u695A\uFF1A"), "AutoGuard \u4E0D\u66FF\u4F01\u4E1A\u5BA3\u5E03\u6839\u56E0\uFF0C\u800C\u662F\u628A\u590D\u6742\u73B0\u573A\u6574\u7406\u6210\u6709\u6765\u6E90\u7684\u8BC1\u636E\u3001\u53D7\u9650\u5019\u9009\u3001\u4EBA\u5DE5\u5BA1\u6838\u52A8\u4F5C\u548C\u53EF\u8BC1\u4F2A\u7684\u5DE5\u7A0B\u4EFB\u52A1\u3002"));
+  }
+  function DemoWorkspace({ cases = [] }) {
+    const [activeIssueId, setActiveIssueId] = React.useState(DEMO_ENTERPRISE_ISSUES[0].id);
+    const activeIssue = DEMO_ENTERPRISE_ISSUES.find((issue) => issue.id === activeIssueId) || DEMO_ENTERPRISE_ISSUES[0];
+    return /* @__PURE__ */ React.createElement("section", { className: "enterprise-issue-demo" }, /* @__PURE__ */ React.createElement(CampusRealCaseDemo, { cases }), /* @__PURE__ */ React.createElement("header", { className: "enterprise-issue-intro" }, /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u95EE\u9898\u9010\u9879\u5BF9\u7167"), /* @__PURE__ */ React.createElement("h1", null, "\u4F01\u4E1A\u63D0\u51FA\u4EC0\u4E48\u95EE\u9898\uFF0C\u6211\u4EEC\u5177\u4F53\u600E\u4E48\u89E3\u51B3"), /* @__PURE__ */ React.createElement("p", null, "\u4E0A\u9762\u7684\u6821\u56ED\u573A\u666F\u7528\u4E8E\u8BF4\u660E\u590D\u6742\u6027\uFF0C\u4E0B\u9762\u4FDD\u7559\u4F01\u4E1A\u9700\u6C42\u4E0E\u771F\u5B9E\u6848\u4F8B\u7684\u9010\u9879\u6620\u5C04\uFF0C\u65B9\u4FBF\u7EE7\u7EED\u8FFD\u95EE\u6BCF\u4E2A\u65B9\u6CD5\u73AF\u8282\u3002")), /* @__PURE__ */ React.createElement("div", { className: "enterprise-issue-layout" }, /* @__PURE__ */ React.createElement("nav", { className: "enterprise-issue-nav", "aria-label": "\u4F01\u4E1A\u63D0\u51FA\u7684\u95EE\u9898" }, DEMO_ENTERPRISE_ISSUES.map((issue) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        key: issue.id,
+        "aria-label": `${issue.requirementId} ${issue.shortTitle}`,
+        className: activeIssue.id === issue.id ? "active" : "",
+        onClick: () => setActiveIssueId(issue.id)
+      },
+      /* @__PURE__ */ React.createElement("span", { className: "mono" }, issue.requirementId),
+      /* @__PURE__ */ React.createElement("strong", null, issue.shortTitle)
+    ))), /* @__PURE__ */ React.createElement("article", { className: "enterprise-issue-detail" }, /* @__PURE__ */ React.createElement("div", { className: "enterprise-issue-title-row" }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, activeIssue.requirementId), /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u9700\u6C42\u4E0E\u65B9\u6CD5\u54CD\u5E94")), /* @__PURE__ */ React.createElement("h2", null, activeIssue.problem), /* @__PURE__ */ React.createElement("p", { className: "enterprise-issue-explanation" }, activeIssue.explanation), /* @__PURE__ */ React.createElement(RealCaseWalkthrough, { issue: activeIssue, cases }), /* @__PURE__ */ React.createElement("div", { className: "enterprise-issue-sections" }, /* @__PURE__ */ React.createElement("section", null, /* @__PURE__ */ React.createElement("span", { className: "enterprise-issue-label" }, "\u6211\u4EEC\u91C7\u7528\u7684\u65B9\u6CD5"), /* @__PURE__ */ React.createElement("strong", null, activeIssue.method), /* @__PURE__ */ React.createElement("p", null, activeIssue.methodDetail)), /* @__PURE__ */ React.createElement("section", null, /* @__PURE__ */ React.createElement("span", { className: "enterprise-issue-label" }, "\u6267\u884C Skill"), /* @__PURE__ */ React.createElement("div", { className: "enterprise-skill-list" }, activeIssue.skills.map((skill) => /* @__PURE__ */ React.createElement("div", { key: skill.name }, /* @__PURE__ */ React.createElement("code", null, skill.name), /* @__PURE__ */ React.createElement("p", null, skill.role)))))))), /* @__PURE__ */ React.createElement("footer", { className: "enterprise-issue-footer" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "\u7EDF\u4E00\u4EF7\u503C\uFF1A"), "\u628A\u4F01\u4E1A\u95EE\u9898\u8F6C\u5316\u4E3A\u53EF\u8FFD\u6EAF\u3001\u53EF\u5BA1\u6838\u3001\u53EF\u9A8C\u8BC1\u7684\u5DE5\u7A0B\u884C\u52A8\uFF0C\u4E0D\u8BA9\u8BC1\u636E\u4E0D\u8DB3\u7684\u5224\u65AD\u76F4\u63A5\u8FDB\u5165\u751F\u4EA7\u7ED3\u8BBA\u3002")));
+  }
+  function RealCaseWalkthrough({ issue, cases }) {
+    const matchedCases = (issue.caseIds || []).map((caseId) => cases.find((item) => item.case_id === caseId)).filter(Boolean);
+    const leadCase = matchedCases[0];
+    const enterprise = leadCase?.enterprise || {};
+    const evidenceIds = issue.caseEvidenceIds || [];
+    const isAggregate = matchedCases.length > 1;
+    return /* @__PURE__ */ React.createElement("section", { className: "real-case-walkthrough", "aria-label": `${issue.requirementId} \u771F\u5B9E\u6848\u4F8B\u8BB2\u89E3` }, /* @__PURE__ */ React.createElement("div", { className: "real-case-heading" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { className: "enterprise-issue-label" }, "\u4F01\u4E1A\u63D0\u4F9B\u7684\u8131\u654F\u771F\u5B9E\u6848\u4F8B"), /* @__PURE__ */ React.createElement("h3", null, isAggregate ? `${matchedCases.length} \u4E2A\u4F01\u4E1A\u771F\u5B9E\u6848\u4F8B\u7684\u5BF9\u7167\u7ED3\u679C` : `\u771F\u5B9E\u6848\u4F8B ${leadCase?.case_id || "\u5F85\u5339\u914D"}`)), /* @__PURE__ */ React.createElement("span", { className: `real-case-status ${leadCase ? stateTone(leadCase) : "amber"}` }, isAggregate ? "\u89C4\u5219\u8986\u76D6\u7ED3\u679C" : leadCase ? caseDecisionLabel(leadCase) : "\u5F85\u5339\u914D")), /* @__PURE__ */ React.createElement("div", { className: "real-case-grid" }, /* @__PURE__ */ React.createElement("div", { className: "real-case-column" }, /* @__PURE__ */ React.createElement("span", { className: "real-case-label" }, "\u4F01\u4E1A\u539F\u59CB\u95EE\u9898"), /* @__PURE__ */ React.createElement("p", null, isAggregate ? matchedCases.map((item) => `${item.case_id}\uFF1A${item.enterprise?.problem || item.title}`).join("\uFF1B") : enterprise.problem || "\u5F85\u4F01\u4E1A\u8865\u5145\u3002")), /* @__PURE__ */ React.createElement("div", { className: "real-case-column" }, /* @__PURE__ */ React.createElement("span", { className: "real-case-label" }, "\u771F\u5B9E\u6570\u636E\u652F\u6301\u4EC0\u4E48"), /* @__PURE__ */ React.createElement("p", null, issue.caseFinding), /* @__PURE__ */ React.createElement("div", { className: "real-case-evidence" }, evidenceIds.map((evidenceId) => /* @__PURE__ */ React.createElement("code", { key: evidenceId }, evidenceId)))), /* @__PURE__ */ React.createElement("div", { className: "real-case-column" }, /* @__PURE__ */ React.createElement("span", { className: "real-case-label" }, "AutoGuard \u5982\u4F55\u5904\u7406"), /* @__PURE__ */ React.createElement("p", null, issue.caseHandling)), /* @__PURE__ */ React.createElement("div", { className: "real-case-column real-case-result" }, /* @__PURE__ */ React.createElement("span", { className: "real-case-label" }, "\u5F53\u524D\u7ED3\u8BBA \xB7 \u4F01\u4E1A\u5F97\u5230\u7684\u7ED3\u679C"), /* @__PURE__ */ React.createElement("p", null, issue.caseConclusion)), /* @__PURE__ */ React.createElement("div", { className: "real-case-column real-case-limit" }, /* @__PURE__ */ React.createElement("span", { className: "real-case-label" }, "\u4E0D\u80FD\u8BF4\u4EC0\u4E48 \xB7 \u5F53\u524D\u8FB9\u754C"), /* @__PURE__ */ React.createElement("p", null, issue.caseNonClaim))));
+  }
+  function OverviewWorkspace({ source, onOpenCase }) {
+    const metrics = source.metrics || {};
+    const cases = source.cases || [];
+    const limited = metrics.analysis_state_distribution?.LIMITED_CANDIDATES_READY ?? 4;
+    const stopped = metrics.analysis_state_distribution?.TERMINAL_STOP ?? 6;
+    return /* @__PURE__ */ React.createElement("section", { className: "page-view overview-workspace" }, /* @__PURE__ */ React.createElement(
+      PageHeading,
+      {
+        eyebrow: "\u4F01\u4E1A\u771F\u5B9E\u6570\u636E\u5206\u6790",
+        title: "10 \u4E2A\u771F\u5B9E\u6848\u4F8B\uFF0C\u65B9\u6CD5\u7ED9\u51FA\u4E24\u7C7B\u5904\u7406\u8DEF\u5F84",
+        detail: "\u5148\u5224\u65AD\u8BC1\u636E\u5141\u8BB8\u505A\u5230\u54EA\u91CC\uFF0C\u518D\u51B3\u5B9A\u7EE7\u7EED\u6392\u67E5\u3001\u660E\u786E\u505C\u7B54\u6216\u4F18\u5148\u5347\u7EA7\u3002"
+      }
+    ), /* @__PURE__ */ React.createElement("div", { className: "overview-metrics" }, /* @__PURE__ */ React.createElement(OverviewMetric, { label: "\u771F\u5B9E\u6848\u4F8B", value: metrics.case_count ?? 10, detail: "ACC\u3001FCW\u3001AEB/AWB\u3001LCC", tone: "ink" }), /* @__PURE__ */ React.createElement(OverviewMetric, { label: "\u53D7\u9650\u5019\u9009", value: limited, detail: "\u53EA\u4F5C\u4E3A Case \u5185\u6392\u67E5\u65B9\u5411", tone: "green" }), /* @__PURE__ */ React.createElement(OverviewMetric, { label: "\u7EC8\u6B62\u6027\u505C\u7B54", value: stopped, detail: "\u8BC1\u636E\u4E0D\u8DB3\u65F6\u505C\u6B62\u5F52\u56E0", tone: "amber" }), /* @__PURE__ */ React.createElement(OverviewMetric, { label: "\u8BC1\u636E\u5F20\u529B", value: metrics.evidence_tension_case_ids?.length ?? 2, detail: "\u4FDD\u7559\u53CC\u65B9\uFF0C\u4E0D\u81EA\u52A8\u88C1\u51B3", tone: "cyan" }), /* @__PURE__ */ React.createElement(OverviewMetric, { label: "\u5B89\u5168\u4F18\u5148", value: metrics.safety_priority_case_ids?.length ?? 1, detail: "\u5B89\u5168\u5347\u7EA7\u4E0E\u6280\u672F\u505C\u7B54\u5E76\u884C", tone: "red" })), /* @__PURE__ */ React.createElement("section", { className: "decision-overview" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u65B9\u6CD5\u5206\u6D41\u7ED3\u679C", detail: "\u540C\u4E00\u6279\u4F01\u4E1A\u771F\u5B9E\u6570\u636E\uFF0C\u7ECF\u5206\u7EA7\u8BC1\u636E\u95E8\u7981\u5F62\u6210 4 \u6848\u53D7\u9650\u5019\u9009\u30016 \u6848\u505C\u7B54\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "decision-bar", "aria-label": `${limited} \u4E2A\u53D7\u9650\u5019\u9009\uFF0C${stopped} \u4E2A\u505C\u7B54\u6848\u4F8B` }, /* @__PURE__ */ React.createElement("div", { className: "limited", style: { width: `${limited * 10}%` } }, /* @__PURE__ */ React.createElement("span", null, limited, " \u53D7\u9650\u5019\u9009")), /* @__PURE__ */ React.createElement("div", { className: "stopped", style: { width: `${stopped * 10}%` } }, /* @__PURE__ */ React.createElement("span", null, stopped, " \u505C\u7B54"))), /* @__PURE__ */ React.createElement("div", { className: "boundary-note" }, /* @__PURE__ */ React.createElement("strong", null, "\u8FD9\u662F\u4EC0\u4E48"), /* @__PURE__ */ React.createElement("span", null, "\u65B9\u6CD5\u5BF9\u771F\u5B9E\u6570\u636E\u7684\u89C4\u5219\u5904\u7406\u7ED3\u679C"), /* @__PURE__ */ React.createElement("strong", null, "\u8FD9\u4E0D\u662F\u4EC0\u4E48"), /* @__PURE__ */ React.createElement("span", null, "\u4E0D\u662F\u5019\u9009\u6B63\u786E\u7387\uFF0C\u4E5F\u4E0D\u662F\u751F\u4EA7\u8BCA\u65AD\u51C6\u786E\u7387"))), /* @__PURE__ */ React.createElement("div", { className: "overview-grid" }, /* @__PURE__ */ React.createElement("section", { className: "case-overview-list" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u6848\u4F8B\u5904\u7406\u6E05\u5355", detail: "\u5148\u770B\u4F01\u4E1A\u95EE\u9898\u4E0E\u5F53\u524D\u65B9\u6CD5\u51B3\u5B9A\uFF0C\u7EC6\u8282\u8FDB\u5165\u6848\u4F8B\u5206\u6790\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "overview-table", role: "table", "aria-label": "\u6848\u4F8B\u5904\u7406\u6E05\u5355" }, /* @__PURE__ */ React.createElement("div", { className: "overview-row overview-head", role: "row" }, /* @__PURE__ */ React.createElement("span", null, "\u6848\u4F8B"), /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u95EE\u9898"), /* @__PURE__ */ React.createElement("span", null, "\u65B9\u6CD5\u51B3\u5B9A"), /* @__PURE__ */ React.createElement("span", null)), cases.map((item) => /* @__PURE__ */ React.createElement("div", { className: "overview-row", role: "row", key: item.case_id }, /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("b", { className: "mono" }, item.case_id), /* @__PURE__ */ React.createElement("small", null, item.domain)), /* @__PURE__ */ React.createElement("strong", null, item.title), /* @__PURE__ */ React.createElement("span", { className: `status-text ${stateTone(item)}` }, caseDecisionLabel(item)), /* @__PURE__ */ React.createElement("button", { type: "button", className: "open-case", onClick: () => onOpenCase(item.case_id) }, "\u67E5\u770B"))))), /* @__PURE__ */ React.createElement("aside", { className: "method-summary" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u771F\u5B9E\u6570\u636E\u6539\u53D8\u4E86\u4EC0\u4E48", detail: "\u65B9\u6CD5\u89C4\u5219\u76F4\u63A5\u6765\u81EA\u5341\u6848\u5206\u6790\u3002" }), /* @__PURE__ */ React.createElement(InsightItem, { number: "01", title: "\u6709\u7A97\u53E3\u4E0D\u7B49\u4E8E\u4E8B\u4EF6\u7ED1\u5B9A", text: "73 \u6761\u89C2\u5BDF\u6709\u7A97\u53E3\uFF0C\u4F46\u5750\u6807\u7CFB\u5747\u672A\u58F0\u660E\uFF1B0 \u6761\u5B8C\u6210\u4E8B\u4EF6\u7EA7\u7ED1\u5B9A\u3002" }), /* @__PURE__ */ React.createElement(InsightItem, { number: "02", title: "\u5F02\u5E38\u6A21\u5F0F\u4E0D\u7B49\u4E8E\u6839\u56E0", text: "\u76EE\u6807\u8FD0\u52A8\u5B66\u3001\u8F66\u9053\u51E0\u4F55\u7B49\u6A21\u5F0F\u53EA\u80FD\u5F62\u6210\u6392\u67E5\u65B9\u5411\u3002" }), /* @__PURE__ */ React.createElement(InsightItem, { number: "03", title: "\u5B89\u5168\u5904\u7F6E\u4E0D\u7B49\u5F85\u5F52\u56E0", text: "RCA-EXT-008 \u5728\u6280\u672F\u505C\u7B54\u7684\u540C\u65F6\u8FDB\u5165\u5B89\u5168\u4F18\u5148\u8DEF\u5F84\u3002" }), /* @__PURE__ */ React.createElement(InsightItem, { number: "04", title: "\u5386\u53F2\u76F8\u4F3C\u53EA\u5E2E\u52A9\u68C0\u7D22", text: "\u8DE8\u6848\u4F8B\u91CD\u590D\u6A21\u5F0F\u4E0D\u80FD\u66FF\u4EE3\u5F53\u524D Case \u7684\u652F\u6301\u8BC1\u636E\u3002" }))));
+  }
+  function OverviewMetric({ label, value, detail, tone }) {
+    return /* @__PURE__ */ React.createElement("div", { className: `overview-metric ${tone}` }, /* @__PURE__ */ React.createElement("span", null, label), /* @__PURE__ */ React.createElement("strong", null, value), /* @__PURE__ */ React.createElement("small", null, detail));
+  }
+  function InsightItem({ number, title, text }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "insight-item" }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, number), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, title), /* @__PURE__ */ React.createElement("p", null, text)));
+  }
+  function CaseWorkspace({ caseItem, mode, onModeChange, stepId, onStepChange }) {
+    return /* @__PURE__ */ React.createElement("section", { className: "page-view case-workspace" }, /* @__PURE__ */ React.createElement(CaseHeader, { caseItem, mode, onModeChange }), /* @__PURE__ */ React.createElement(CaseStateBand, { caseItem }), mode === "story" ? /* @__PURE__ */ React.createElement(StoryWorkspace, { caseItem, stepId, onStepChange }) : /* @__PURE__ */ React.createElement(EngineeringWorkspace, { caseItem }));
+  }
+  function CaseHeader({ caseItem, mode, onModeChange }) {
+    return /* @__PURE__ */ React.createElement("section", { className: "case-header" }, /* @__PURE__ */ React.createElement("div", { className: "case-title-row" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "eyebrow" }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, caseItem.case_id), /* @__PURE__ */ React.createElement("span", null, caseItem.domain)), /* @__PURE__ */ React.createElement("h1", null, caseItem.title)), /* @__PURE__ */ React.createElement(ModeSwitch, { mode, onChange: onModeChange })), /* @__PURE__ */ React.createElement("div", { className: "boundary-band" }, /* @__PURE__ */ React.createElement("strong", null, "\u4F01\u4E1A\u8131\u654F\u771F\u5B9E\u6848\u4F8B\u6D3E\u751F\u6570\u636E"), /* @__PURE__ */ React.createElement("span", null, "\u539F\u59CB MCAP \u672A\u63D0\u4F9B"), /* @__PURE__ */ React.createElement("span", null, "\u5F53\u524D\u4E0D\u80FD\u786E\u8BA4\u6839\u56E0"), /* @__PURE__ */ React.createElement("span", null, "\u8F66\u7AEF\u4EC5\u4F20\u9012\u65E5\u5FD7")));
+  }
+  function ModeSwitch({ mode, onChange }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "mode-switch", role: "group", "aria-label": "\u5C55\u793A\u6A21\u5F0F" }, /* @__PURE__ */ React.createElement("button", { type: "button", className: mode === "story" ? "active" : "", onClick: () => onChange("story") }, "\u8BB2\u89E3\u6A21\u5F0F"), /* @__PURE__ */ React.createElement("button", { type: "button", className: mode === "engineering" ? "active" : "", onClick: () => onChange("engineering") }, "\u5DE5\u7A0B\u6A21\u5F0F"));
+  }
+  function CaseStateBand({ caseItem }) {
+    const candidateCount = caseItem.engineering.hypotheses.length;
+    return /* @__PURE__ */ React.createElement("div", { className: `case-state-band ${stateTone(caseItem)}` }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u5F53\u524D\u65B9\u6CD5\u51B3\u5B9A"), /* @__PURE__ */ React.createElement("strong", null, caseDecisionLabel(caseItem))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u5019\u9009\u673A\u5236"), /* @__PURE__ */ React.createElement("strong", null, candidateCount > 0 ? `${candidateCount} \u4E2A\uFF0C\u4EC5\u9650\u672C\u6848` : "\u4E0D\u751F\u6210\u5019\u9009")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u4EBA\u5DE5\u95E8\u7981"), /* @__PURE__ */ React.createElement("strong", null, "\u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u6839\u56E0\u6743\u9650"), /* @__PURE__ */ React.createElement("strong", null, "\u7981\u6B62\u786E\u8BA4")));
+  }
+  function StoryWorkspace({ caseItem, stepId, onStepChange }) {
+    const story = window.AutoGuardPresentation.buildStoryView(caseItem);
+    const activeStep = story.steps.find((step) => step.id === stepId) || story.steps[0];
+    return /* @__PURE__ */ React.createElement("section", { className: "story-workspace" }, /* @__PURE__ */ React.createElement("div", { className: "story-tabs", role: "tablist", "aria-label": "\u4F01\u4E1A\u95EE\u9898\u8BB2\u89E3\u6B65\u9AA4" }, story.steps.map((step) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        role: "tab",
+        "aria-selected": step.id === activeStep.id,
+        className: step.id === activeStep.id ? "active" : "",
+        key: step.id,
+        onClick: () => onStepChange(step.id)
+      },
+      step.label
+    ))), /* @__PURE__ */ React.createElement(StoryPanel, { step: activeStep }), /* @__PURE__ */ React.createElement(CaseMethodResult, { caseItem }));
+  }
+  function StoryPanel({ step }) {
+    return /* @__PURE__ */ React.createElement("article", { className: "story-panel", role: "tabpanel" }, /* @__PURE__ */ React.createElement("div", { className: "story-index" }, step.label.slice(0, 2)), /* @__PURE__ */ React.createElement("div", { className: "story-content" }, /* @__PURE__ */ React.createElement("span", { className: "section-label" }, "\u4F01\u4E1A\u95EE\u9898\u4E0E\u65B9\u6CD5\u54CD\u5E94"), /* @__PURE__ */ React.createElement("h2", null, step.question), /* @__PURE__ */ React.createElement("div", { className: "method-line" }, /* @__PURE__ */ React.createElement("span", null, "\u6211\u4EEC\u7684\u65B9\u5F0F"), /* @__PURE__ */ React.createElement("p", null, step.method)), /* @__PURE__ */ React.createElement("div", { className: "answer-block" }, /* @__PURE__ */ React.createElement("span", null, "\u771F\u5B9E\u6570\u636E\u56DE\u7B54"), paragraphs(step.answer)), /* @__PURE__ */ React.createElement("div", { className: "limit-line" }, /* @__PURE__ */ React.createElement("strong", null, "\u7ED3\u8BBA\u8FB9\u754C"), /* @__PURE__ */ React.createElement("p", null, step.boundary))));
+  }
+  function CaseMethodResult({ caseItem }) {
+    const engineering = caseItem.engineering;
+    if (caseItem.safety_route === "SAFETY_PRIORITY_REVIEW") {
+      return /* @__PURE__ */ React.createElement("section", { className: "case-result safety" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u5B89\u5168\u8DEF\u5F84"), /* @__PURE__ */ React.createElement("h2", null, "\u5B89\u5168\u4F18\u5148\u5347\u7EA7\u4E0E\u6280\u672F\u505C\u7B54\u5E76\u884C")), /* @__PURE__ */ React.createElement("p", null, "\u4F01\u4E1A\u62A5\u544A\u6D89\u53CA\u9AD8\u540E\u679C\u98CE\u9669\uFF0C\u4F46\u5F53\u524D\u6570\u636E\u4E0D\u80FD\u786E\u8BA4\u78B0\u649E\u4E8B\u5B9E\u3001\u4F24\u5BB3\u7B49\u7EA7\u6216\u6280\u672F\u6839\u56E0\u3002\u5B89\u5168\u8D23\u4EFB\u8DEF\u5F84\u65E0\u9700\u7B49\u5F85\u6280\u672F\u5F52\u56E0\u7ED3\u675F\u3002"));
+    }
+    if (caseItem.evidence_tension_state === "EVIDENCE_TENSION") {
+      return /* @__PURE__ */ React.createElement("section", { className: "case-result tension" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u8BC1\u636E\u5F20\u529B"), /* @__PURE__ */ React.createElement("h2", null, "\u62A5\u544A\u4E0E\u6D3E\u751F\u89C2\u5BDF\u540C\u65F6\u4FDD\u7559")), /* @__PURE__ */ React.createElement("p", null, "\u4E24\u4FA7 Evidence ID \u5747\u88AB\u4FDD\u7559\u4E3A `UNRESOLVED`\uFF0C\u7CFB\u7EDF\u4E0D\u81EA\u52A8\u5224\u65AD\u54EA\u4E00\u65B9\u6B63\u786E\uFF0C\u4E5F\u4E0D\u628A\u5F20\u529B\u6539\u5199\u6210\u6839\u56E0\u3002"));
+    }
+    if (caseItem.analysis_state === "LIMITED_CANDIDATES_READY") {
+      return /* @__PURE__ */ React.createElement("section", { className: "candidate-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u53D7\u9650\u6392\u67E5\u5019\u9009", detail: "\u5019\u9009\u53EA\u7528\u4E8E\u672C\u6848\u6392\u67E5\u6392\u5E8F\uFF0C\u5747\u7981\u6B62\u4E8B\u4EF6\u5F52\u56E0\u548C\u6839\u56E0\u786E\u8BA4\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "candidate-list" }, engineering.hypotheses.map((candidate, index) => /* @__PURE__ */ React.createElement("article", { className: "candidate-row", key: candidate.candidate_id }, /* @__PURE__ */ React.createElement("span", { className: "candidate-rank" }, String(index + 1).padStart(2, "0")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, candidate.mechanism_label), /* @__PURE__ */ React.createElement("small", null, "\u652F\u6301 ", candidate.support_evidence_ids.length, " \xB7 \u53CD\u8BC1 ", candidate.counter_evidence_ids.length, " \xB7 \u7F3A\u5931 ", candidate.missing_evidence_ids.length)), /* @__PURE__ */ React.createElement("span", null, "\u4EC5\u9650\u672C\u6848")))));
+    }
+    return /* @__PURE__ */ React.createElement("section", { className: "case-result stop" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u7EC8\u6B62\u6027\u505C\u7B54"), /* @__PURE__ */ React.createElement("h2", null, "\u5F53\u524D\u8BC1\u636E\u4E0D\u8DB3\u4EE5\u5F62\u6210\u53EF\u5BA1\u8BA1\u5019\u9009")), /* @__PURE__ */ React.createElement("p", null, "\u7F3A\u5931\u9879\u5DF2\u767B\u8BB0\u4E3A\u6C38\u4E45\u53EF\u89C2\u6D4B\u6027\u9650\u5236\u3002\u7CFB\u7EDF\u505C\u6B62\u5F52\u56E0\uFF0C\u4F46\u4FDD\u7559\u8BC1\u636E\u5FEB\u7167\u548C\u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838\u8BB0\u5F55\u3002"));
+  }
+  function EngineeringWorkspace({ caseItem }) {
+    const engineering = caseItem.engineering;
+    return /* @__PURE__ */ React.createElement("section", { className: "engineering-workspace" }, /* @__PURE__ */ React.createElement("div", { className: "engineering-grid" }, /* @__PURE__ */ React.createElement("section", { className: "engineering-section snapshot-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u4E0D\u53EF\u53D8\u8BC1\u636E\u5FEB\u7167", detail: "\u5206\u6790\u7ED3\u679C\u4E0E\u6765\u6E90\u54C8\u5E0C\u7ED1\u5B9A\uFF0C\u8BC1\u636E\u53D8\u5316\u540E\u5FC5\u987B\u751F\u6210\u65B0\u5FEB\u7167\u3002" }), /* @__PURE__ */ React.createElement(KeyValue, { label: "Snapshot ID", value: engineering.evidence_snapshot_id, mono: true }), /* @__PURE__ */ React.createElement(KeyValue, { label: "\u5185\u5BB9\u54C8\u5E0C", value: engineering.content_hash, mono: true }), /* @__PURE__ */ React.createElement(KeyValue, { label: "\u6848\u4F8B SHA-256", value: engineering.source_hashes.case_sha256, mono: true }), /* @__PURE__ */ React.createElement(KeyValue, { label: "Manifest SHA-256", value: engineering.source_hashes.manifest_sha256, mono: true })), /* @__PURE__ */ React.createElement("section", { className: "engineering-section gate-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5F53\u524D\u65B9\u6CD5\u95E8\u7981", detail: "\u7A97\u53E3\u3001\u5BF9\u9F50\u3001\u5019\u9009\u8303\u56F4\u548C\u5F52\u56E0\u6743\u9650\u5206\u522B\u5224\u65AD\u3002" }), /* @__PURE__ */ React.createElement("div", { className: `gate-callout ${stateTone(caseItem)}` }, /* @__PURE__ */ React.createElement("strong", null, ANALYSIS_LABELS[caseItem.analysis_state]), /* @__PURE__ */ React.createElement("p", null, "\u5BF9\u9F50\u65B9\u5F0F\uFF1A", engineering.alignment.method, " \xB7 \u7F6E\u4FE1\u5EA6\uFF1A", engineering.alignment.confidence), /* @__PURE__ */ React.createElement("code", null, caseItem.analysis_state), /* @__PURE__ */ React.createElement("span", null, "eventAttributionAllowed = false")))), /* @__PURE__ */ React.createElement("section", { className: "engineering-section scoring-boundary-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u8BC4\u5206\u5173\u952E\u8FB9\u754C", detail: "\u628A\u4F01\u4E1A\u8BC4\u5206\u8981\u6C42\u8868\u8FBE\u5B8C\u6574\uFF0C\u4F46\u4E0D\u628A\u7F3A\u5931\u5B57\u6BB5\u3001\u76EE\u6807\u89D2\u8272\u6216\u5019\u9009\u5173\u7CFB\u6539\u5199\u6210\u4E8B\u5B9E\u5F52\u56E0\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "scoring-boundary-grid" }, /* @__PURE__ */ React.createElement("article", null, /* @__PURE__ */ React.createElement("span", null, "\u76EE\u6807\u89D2\u8272\u4E0E\u5B9E\u4F53\u8FDE\u7EED\u6027"), /* @__PURE__ */ React.createElement("strong", null, engineering.target_roles.join(" \xB7 ")), /* @__PURE__ */ React.createElement("p", null, engineering.alignment.entity_bindings.length, " \u4E2A\u89D2\u8272\u5747\u53EA\u6709\u62A5\u544A\u7EA7\u89D2\u8272\u4FE1\u606F\uFF0C\u76EE\u6807 ID \u4E0E\u8FDE\u7EED\u6027\u4E0D\u53EF\u9A8C\u8BC1\u3002")), /* @__PURE__ */ React.createElement("article", null, /* @__PURE__ */ React.createElement("span", null, "\u6D4B\u91CF\u53EF\u6267\u884C\u6027"), /* @__PURE__ */ React.createElement("strong", null, MEASUREMENT_STATUS_LABELS[engineering.measurement_assessment.execution_status] || engineering.measurement_assessment.execution_status), /* @__PURE__ */ React.createElement("p", null, "\u903B\u8F91\u4FE1\u53F7\u7528\u4E8E\u8BF4\u660E\u5E94\u68C0\u67E5\u4EC0\u4E48\uFF1B\u5F53\u524D\u6CA1\u6709\u539F\u59CB\u8FDE\u7EED\u5E8F\u5217\u3001\u5355\u4F4D\u548C\u9608\u503C\uFF0C\u4E0D\u80FD\u590D\u7B97\u7269\u7406\u91CF\u3002")), /* @__PURE__ */ React.createElement("article", null, /* @__PURE__ */ React.createElement("span", null, "\u975E\u5F52\u56E0\u5F0F\u56E0\u679C\u7ED3\u6784"), /* @__PURE__ */ React.createElement("strong", null, engineering.causal_structure.edges.length, " \u6761\u8BC1\u636E\u5173\u7CFB"), /* @__PURE__ */ React.createElement("p", null, "\u53EA\u8868\u8FBE\u652F\u6301\u3001\u53CD\u8BC1\u548C\u963B\u65AD\uFF0C\u4E0D\u5305\u542B\u201C\u5DF2\u7ECF\u5BFC\u81F4\u201D\u7684\u56E0\u679C\u8FB9\u3002")), /* @__PURE__ */ React.createElement("article", null, /* @__PURE__ */ React.createElement("span", null, "\u6280\u672F\u8D23\u4EFB\u8FB9\u754C"), /* @__PURE__ */ React.createElement("strong", null, RESPONSIBILITY_STATUS_LABELS[engineering.responsibility_boundary.status] || engineering.responsibility_boundary.status), /* @__PURE__ */ React.createElement("p", null, "\u5F53\u524D\u53EA\u5141\u8BB8\u4EBA\u5DE5\u5BA1\u6838\u8FB9\u754C\u548C\u4E0B\u4E00\u6B65\u52A8\u4F5C\uFF0C\u4E0D\u5141\u8BB8\u5206\u914D\u751F\u4EA7\u8D23\u4EFB\u57DF\u3002")))), engineering.hypotheses.length > 0 && /* @__PURE__ */ React.createElement("section", { className: "engineering-section observation-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5019\u9009\u673A\u5236\u8BC1\u636E\u7ED1\u5B9A", detail: "\u6BCF\u4E2A\u5019\u9009\u540C\u65F6\u7ED1\u5B9A\u652F\u6301\u3001\u53CD\u8BC1\u3001\u7F3A\u5931\u8BC1\u636E\u548C\u66FF\u4EE3\u89E3\u91CA\u3002" }), /* @__PURE__ */ React.createElement(CandidateEvidenceTable, { candidates: engineering.hypotheses })), /* @__PURE__ */ React.createElement("section", { className: "engineering-section observation-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u6D3E\u751F\u89C2\u5BDF\u4E0E\u8BC1\u636E\u5F15\u7528", detail: "\u8FD9\u4E9B\u7ED3\u679C\u6765\u81EA\u8131\u654F\u6D3E\u751F\u68C0\u67E5\uFF0C\u4E0D\u662F\u91CD\u65B0\u8BA1\u7B97\u7684\u539F\u59CB\u6D4B\u91CF\u3002" }), /* @__PURE__ */ React.createElement(ObservationTable, { observations: engineering.derived_observations })), /* @__PURE__ */ React.createElement("div", { className: "engineering-grid lower-grid" }, /* @__PURE__ */ React.createElement("section", { className: "engineering-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u8BC1\u636E\u76EE\u5F55", detail: `${engineering.evidence_items.length} \u4E2A\u6709\u6548 Evidence ID` }), /* @__PURE__ */ React.createElement("div", { className: "evidence-catalog" }, engineering.evidence_items.map((item) => /* @__PURE__ */ React.createElement("div", { className: "evidence-entry", key: item.evidence_id }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, item.evidence_id), /* @__PURE__ */ React.createElement("strong", null, item.data_class), /* @__PURE__ */ React.createElement("small", null, item.source, " \xB7 ", item.quality))))), /* @__PURE__ */ React.createElement("section", { className: "engineering-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u6C38\u4E45\u8FB9\u754C\u4E0E\u8D23\u4EFB\u5BA1\u6838", detail: "\u7F3A\u5931\u9879\u4E0D\u80FD\u901A\u8FC7\u9ED8\u8BA4\u503C\u6216\u5916\u90E8\u6848\u4F8B\u8865\u9F50\u3002" }), /* @__PURE__ */ React.createElement("ul", { className: "missing-list" }, engineering.missing_evidence_ids.map((id) => /* @__PURE__ */ React.createElement("li", { className: "mono", key: id }, id))), /* @__PURE__ */ React.createElement("div", { className: "review-callout" }, /* @__PURE__ */ React.createElement("strong", null, "\u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838"), /* @__PURE__ */ React.createElement("p", null, engineering.decision.next_action), /* @__PURE__ */ React.createElement("span", null, "\u53EA\u6279\u51C6\u4E0B\u4E00\u6B65\u52A8\u4F5C\uFF0C\u4E0D\u6279\u51C6\u751F\u4EA7\u6839\u56E0\uFF1B\u5BA1\u6838\u4EBA\u6570\u7531\u4F01\u4E1A\u5236\u5EA6\u51B3\u5B9A\u3002")))));
+  }
+  function CandidateEvidenceTable({ candidates }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "candidate-evidence-table", role: "table", "aria-label": "\u5019\u9009\u673A\u5236\u8BC1\u636E\u7ED1\u5B9A" }, /* @__PURE__ */ React.createElement("div", { className: "candidate-evidence-row candidate-evidence-head", role: "row" }, /* @__PURE__ */ React.createElement("span", null, "\u5019\u9009\u673A\u5236"), /* @__PURE__ */ React.createElement("span", null, "\u652F\u6301"), /* @__PURE__ */ React.createElement("span", null, "\u53CD\u8BC1"), /* @__PURE__ */ React.createElement("span", null, "\u7F3A\u5931"), /* @__PURE__ */ React.createElement("span", null, "\u8303\u56F4")), candidates.map((item) => /* @__PURE__ */ React.createElement("div", { className: "candidate-evidence-row", role: "row", key: item.candidate_id }, /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("strong", null, item.mechanism_label), /* @__PURE__ */ React.createElement("small", { className: "mono" }, item.mechanism_id)), /* @__PURE__ */ React.createElement("span", null, item.support_evidence_ids.length), /* @__PURE__ */ React.createElement("span", null, item.counter_evidence_ids.length), /* @__PURE__ */ React.createElement("span", null, item.missing_evidence_ids.length), /* @__PURE__ */ React.createElement("span", null, "CASE_RELEVANT_ONLY"))));
+  }
+  function MethodWorkspace({ source, enterpriseRoute }) {
+    const metrics = source.metrics || {};
+    const route = enterpriseRoute || METHOD_ROUTE_FALLBACK;
+    const nodes = route.nodes || [];
+    const mainlineNodes = nodes.filter((node) => node.method_role === "MAINLINE");
+    const branchNodes = nodes.filter((node) => node.method_role === "OPTIONAL_PARALLEL_BRANCH");
+    const nodeById = new Map(nodes.map((node) => [node.node_id, node]));
+    return /* @__PURE__ */ React.createElement("section", { className: "page-view method-workspace" }, /* @__PURE__ */ React.createElement(
+      PageHeading,
+      {
+        eyebrow: "\u65B9\u6CD5\u9A8C\u8BC1",
+        title: "\u65B9\u6CD5\u7531\u4F01\u4E1A\u771F\u5B9E\u6570\u636E\u6821\u51C6\uFF0C\u4E0D\u7531\u9884\u8BBE\u6D41\u7A0B\u66FF\u6570\u636E\u4F5C\u7B54",
+        detail: "\u9A8C\u8BC1\u7CFB\u7EDF\u662F\u5426\u6B63\u786E\u6574\u7406\u8BC1\u636E\u3001\u9650\u5236\u5019\u9009\u3001\u505C\u7B54\u548C\u5347\u7EA7\uFF0C\u4E0D\u628A\u5341\u6848\u5305\u88C5\u6210\u6709\u6807\u51C6\u7B54\u6848\u7684\u51C6\u786E\u7387\u8003\u8BD5\u3002"
+      }
+    ), /* @__PURE__ */ React.createElement("section", { className: "method-data-band" }, /* @__PURE__ */ React.createElement(MethodDatum, { value: metrics.evidence_item_count ?? 146, label: "146 \u6761\u51BB\u7ED3\u8BC1\u636E" }), /* @__PURE__ */ React.createElement(MethodDatum, { value: metrics.derived_observation_count ?? 80, label: "80 \u6761\u6D3E\u751F\u89C2\u5BDF" }), /* @__PURE__ */ React.createElement(MethodDatum, { value: metrics.observations_with_window ?? 73, label: "73 \u6761\u5177\u6709\u65F6\u95F4\u7A97\u53E3" }), /* @__PURE__ */ React.createElement(MethodDatum, { value: metrics.observations_without_window ?? 7, label: "7 \u6761\u7F3A\u5C11 window_s", tone: "amber" }), /* @__PURE__ */ React.createElement(MethodDatum, { value: metrics.event_bound_observation_count ?? 0, label: "0 \u6761\u5B8C\u6210\u4E8B\u4EF6\u7EA7\u7ED1\u5B9A", tone: "red" })), /* @__PURE__ */ React.createElement("section", { className: "route-overview" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5B8C\u6574\u94FE\u8DEF\u72B6\u6001", detail: "\u80FD\u529B\u94FE\u8DEF\u4FDD\u6301\u5B8C\u6574\uFF1B\u72B6\u6001\u53EA\u8BF4\u660E\u5F53\u524D\u4F01\u4E1A\u771F\u5B9E\u6570\u636E\u9A8C\u8BC1\u5230\u4E86\u54EA\u91CC\u3002" }), route.runtime?.degraded && /* @__PURE__ */ React.createElement("div", { className: "route-runtime-note" }, "\u5F53\u524D\u663E\u793A\u5185\u7F6E\u65B9\u6CD5\u57FA\u7EBF\uFF0C\u8DEF\u7EBF\u670D\u52A1\u672A\u8FDE\u63A5\uFF1B\u771F\u5B9E\u6848\u4F8B\u6570\u636E\u548C\u7ED3\u8BBA\u8FB9\u754C\u4E0D\u56E0\u6B64\u6539\u53D8\u3002"), /* @__PURE__ */ React.createElement("div", { className: "vehicle-boundary-line" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u8F66\u7AEF\u8FB9\u754C"), /* @__PURE__ */ React.createElement("strong", null, "\u53EA\u8BFB\u4F20\u9012\u65E5\u5FD7\u4E0E\u4E8B\u4EF6\u7D22\u5F15")), /* @__PURE__ */ React.createElement("p", null, "\u590D\u6742\u5206\u6790\u3001\u5019\u9009\u751F\u6210\u548C\u5BA1\u6838\u5747\u5728\u8F66\u5916\u5B8C\u6210\uFF0C\u4E0D\u8BFB\u53D6\u63A7\u5236\u6743\uFF0C\u4E0D\u5411\u8F66\u7AEF\u56DE\u5199\u63A7\u5236\u3002"), /* @__PURE__ */ React.createElement(RouteStatus, { status: nodeById.get("VEHICLE_LOG_TRANSFER")?.current_status })), /* @__PURE__ */ React.createElement("div", { className: "route-node-grid", "aria-label": "G1 \u5230 G7 \u5B8C\u6574\u4E3B\u7EBF" }, mainlineNodes.map((node) => /* @__PURE__ */ React.createElement("article", { className: "route-node", key: node.node_id }, /* @__PURE__ */ React.createElement("div", { className: "route-node-head" }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, node.stage), /* @__PURE__ */ React.createElement(RouteStatus, { status: node.current_status, compact: true })), /* @__PURE__ */ React.createElement("strong", null, node.title), /* @__PURE__ */ React.createElement("p", null, ROUTE_NODE_DETAILS[node.node_id])))), /* @__PURE__ */ React.createElement("div", { className: "route-branches" }, /* @__PURE__ */ React.createElement("div", { className: "branch-intro" }, /* @__PURE__ */ React.createElement("span", null, "G3 \u53EF\u9009\u5E76\u884C\u5206\u652F"), /* @__PURE__ */ React.createElement("strong", null, "\u7F3A\u6570\u636E\u53EA\u5173\u95ED\u8BE5\u5206\u652F\uFF0C\u4E0D\u963B\u65AD\u666E\u901A RCA \u4E3B\u7EBF")), branchNodes.map((node) => /* @__PURE__ */ React.createElement("div", { className: "route-branch", key: node.node_id }, /* @__PURE__ */ React.createElement("strong", null, branchDisplayTitle(node)), /* @__PURE__ */ React.createElement(RouteStatus, { status: node.current_status })))), /* @__PURE__ */ React.createElement("div", { className: "route-assurance-line" }, /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("b", null, "M0"), " \u65B9\u6CD5\u884C\u4E3A\u4E0E\u8D8A\u754C\u9A8C\u8BC1"), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("b", null, "\u65B0\u6570\u636E"), " \u5148\u5206\u8BCA\u5F71\u54CD\u8303\u56F4\uFF0C\u518D\u6700\u5C0F\u91CD\u8DD1\u53D7\u5F71\u54CD\u5DE5\u4EF6"))), /* @__PURE__ */ React.createElement("section", { className: "requirement-coverage" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "11 \u9879\u4F01\u4E1A\u9700\u6C42", detail: "\u4ECE\u4F01\u4E1A\u95EE\u9898\u51FA\u53D1\uFF0C\u8BF4\u660E\u7531\u54EA\u4E2A\u65B9\u6CD5\u8282\u70B9\u89E3\u51B3\uFF0C\u4EE5\u53CA\u5F53\u524D\u8BC1\u636E\u72B6\u6001\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "requirement-table", role: "table", "aria-label": "11 \u9879\u4F01\u4E1A\u9700\u6C42\u8986\u76D6" }, /* @__PURE__ */ React.createElement("div", { className: "requirement-row requirement-head", role: "row" }, /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u9700\u6C42"), /* @__PURE__ */ React.createElement("span", null, "\u89E3\u51B3\u65B9\u6CD5"), /* @__PURE__ */ React.createElement("span", null, "\u5F53\u524D\u8BC1\u636E\u72B6\u6001")), (route.requirements || []).map((requirement) => /* @__PURE__ */ React.createElement("div", { className: "requirement-row", role: "row", key: requirement.requirement_id }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("b", { className: "mono" }, requirement.requirement_id), /* @__PURE__ */ React.createElement("strong", null, requirement.problem)), /* @__PURE__ */ React.createElement("span", null, requirement.node_ids.map((nodeId) => nodeById.get(nodeId)?.title || nodeId).join(" + ")), /* @__PURE__ */ React.createElement(RouteStatus, { status: requirement.current_status }))))), /* @__PURE__ */ React.createElement("section", { className: "observation-audit" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u65F6\u95F4\u8BED\u4E49\u5BA1\u8BA1", detail: "\u6709\u7A97\u53E3\u548C\u5B8C\u6210\u4E8B\u4EF6\u7ED1\u5B9A\u662F\u4E24\u4E2A\u4E0D\u540C\u6761\u4EF6\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "audit-chart" }, /* @__PURE__ */ React.createElement("div", { className: "audit-bar" }, /* @__PURE__ */ React.createElement("div", { className: "windowed", style: { width: "91.25%" } }, /* @__PURE__ */ React.createElement("span", null, "73 \u6709\u7A97\u53E3")), /* @__PURE__ */ React.createElement("div", { className: "windowless", style: { width: "8.75%" } }, /* @__PURE__ */ React.createElement("span", null, "7 \u7F3A\u7A97\u53E3"))), /* @__PURE__ */ React.createElement("div", { className: "event-binding-zero" }, /* @__PURE__ */ React.createElement("strong", null, "0"), /* @__PURE__ */ React.createElement("span", null, "\u4E8B\u4EF6\u7EA7\u65F6\u95F4\u7ED1\u5B9A"))), /* @__PURE__ */ React.createElement("p", null, "73 \u6761\u7A97\u53E3\u5750\u6807\u7CFB\u5747\u672A\u58F0\u660E\uFF0C\u56E0\u6B64\u53EA\u80FD\u652F\u6301 Case \u7EA7\u76F8\u5173\u6027\uFF0C\u4E0D\u80FD\u8BC1\u660E\u89C2\u5BDF\u4E0E\u5F02\u5E38\u540C\u7A97\u3001\u5148\u540E\u6216\u5B58\u5728\u56E0\u679C\u3002")), /* @__PURE__ */ React.createElement("section", { className: "method-change-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u771F\u5B9E\u6570\u636E\u5982\u4F55\u6539\u53D8\u65B9\u6CD5", detail: "\u6BCF\u6761\u89C4\u5219\u90FD\u5BF9\u5E94\u5341\u6848\u4E2D\u5B9E\u9645\u51FA\u73B0\u7684\u95EE\u9898\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "method-change-table" }, /* @__PURE__ */ React.createElement(MethodChange, { finding: "73 \u6761\u89C2\u5BDF\u6709\u7A97\u53E3\uFF0C\u4F46\u5750\u6807\u7CFB\u672A\u58F0\u660E", risk: "\u76F4\u63A5\u6BD4\u8F83\u7A97\u53E3\u4F1A\u4EA7\u751F\u4F2A\u65F6\u5E8F", rule: "\u56FA\u5B9A\u4E3A Case \u7EA7\u76F8\u5173\uFF0C\u4E0D\u5141\u8BB8\u4E8B\u4EF6\u5F52\u56E0" }), /* @__PURE__ */ React.createElement(MethodChange, { finding: "7 \u6761\u89C2\u5BDF\u6CA1\u6709 window_s", risk: "\u65E0\u7A97\u53E3\u5F02\u5E38\u53EF\u80FD\u88AB\u5F53\u4F5C\u6280\u672F\u652F\u6301", rule: "\u4FDD\u7559\u5BA1\u8BA1\uFF0C\u4F46\u7981\u6B62\u8FDB\u5165\u652F\u6301\u8BC1\u636E" }), /* @__PURE__ */ React.createElement(MethodChange, { finding: "\u540C\u6848\u540C\u65F6\u5B58\u5728\u652F\u6301\u3001\u53CD\u8BC1\u548C\u7F3A\u5931", risk: "\u53EA\u663E\u793A\u652F\u6301\u9879\u4F1A\u9020\u6210\u5355\u4E00\u8DEF\u5F84\u504F\u89C1", rule: "\u5019\u9009\u5FC5\u987B\u540C\u65F6\u5F15\u7528\u4E09\u7C7B\u8BC1\u636E\u4E0E\u66FF\u4EE3\u89E3\u91CA" }), /* @__PURE__ */ React.createElement(MethodChange, { finding: "RCA-EXT-004\u3001010 \u51FA\u73B0\u8BC1\u636E\u5F20\u529B", risk: "AI \u81EA\u52A8\u9009\u8FB9\u4F1A\u5236\u9020\u786E\u5B9A\u6027", rule: "\u53CC\u8FB9 Evidence ID \u4FDD\u6301 UNRESOLVED" }), /* @__PURE__ */ React.createElement(MethodChange, { finding: "RCA-EXT-008 \u6D89\u53CA\u9AD8\u540E\u679C\u62A5\u544A", risk: "\u7B49\u5F85\u6839\u56E0\u4F1A\u5EF6\u8FDF\u5B89\u5168\u5904\u7F6E", rule: "\u5B89\u5168\u5347\u7EA7\u4E0E\u6280\u672F\u505C\u7B54\u5E76\u884C" }), /* @__PURE__ */ React.createElement(MethodChange, { finding: "\u4F01\u4E1A\u672A\u63D0\u4F9B\u5BA1\u6838\u7EC4\u7EC7\u89C4\u5219", risk: "\u65B9\u6CD5\u64C5\u81EA\u89C4\u5B9A\u4E24\u540D\u5BA1\u6838\u5458", rule: "\u4F01\u4E1A\u8D23\u4EFB\u4EBA\u95E8\u7981\uFF0C\u4EBA\u6570\u7531\u4F01\u4E1A\u5236\u5EA6\u51B3\u5B9A" }))), /* @__PURE__ */ React.createElement("div", { className: "verification-boundaries" }, /* @__PURE__ */ React.createElement("section", { className: "verified-scope" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5F53\u524D\u5DF2\u9A8C\u8BC1", detail: "\u771F\u5B9E\u6570\u636E\u4E0A\u7684\u65B9\u6CD5\u884C\u4E3A" }), /* @__PURE__ */ React.createElement("ul", null, /* @__PURE__ */ React.createElement("li", null, "\u6765\u6E90\u5BA1\u8BA1\u3001\u8BC1\u636E\u51BB\u7ED3\u548C Evidence ID \u5F15\u7528"), /* @__PURE__ */ React.createElement("li", null, "\u53D7\u9650\u5019\u9009\u3001\u7EC8\u6B62\u6027\u505C\u7B54\u548C\u8D8A\u754C\u62D2\u7EDD"), /* @__PURE__ */ React.createElement("li", null, "\u8BC1\u636E\u5F20\u529B\u4FDD\u7559\u4E0E\u5B89\u5168\u4F18\u5148\u5347\u7EA7"), /* @__PURE__ */ React.createElement("li", null, "\u4F01\u4E1A\u8D23\u4EFB\u5BA1\u6838\u5165\u53E3\u4E0E\u5FEB\u7167\u5931\u6548"))), /* @__PURE__ */ React.createElement("section", { className: "unverified-scope" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5F53\u524D\u672A\u9A8C\u8BC1", detail: "\u73B0\u6709\u4F01\u4E1A\u6570\u636E\u4E0D\u5177\u5907\u8BC4\u4EF7\u6761\u4EF6" }), /* @__PURE__ */ React.createElement("ul", null, /* @__PURE__ */ React.createElement("li", null, "\u751F\u4EA7\u6839\u56E0\u6B63\u786E\u6027\u4E0E\u8D23\u4EFB\u57DF"), /* @__PURE__ */ React.createElement("li", null, "\u8BCA\u65AD\u51C6\u786E\u7387\u4E0E\u8DE8\u8F66\u578B\u6CDB\u5316"), /* @__PURE__ */ React.createElement("li", null, "OTA \u56E0\u679C\u3001\u56DE\u653E\u3001\u4FEE\u590D\u548C\u56DE\u5F52\u6548\u679C"), /* @__PURE__ */ React.createElement("li", null, "\u8F66\u7AEF\u8D44\u6E90\u5360\u7528\u4E0E\u5386\u53F2\u77E5\u8BC6\u5B9E\u9645\u6536\u76CA")))), /* @__PURE__ */ React.createElement("div", { className: "final-boundary" }, "\u57FA\u4E8E\u5F53\u524D\u4F01\u4E1A\u6570\u636E\uFF0C\u4E0D\u5F97\u58F0\u79F0\u5DF2\u7ECF\u786E\u8BA4\u6839\u56E0\u3001\u8FBE\u5230\u8BCA\u65AD\u51C6\u786E\u7387\u6216\u5EFA\u7ACB OTA \u56E0\u679C\u5173\u7CFB\u3002"));
+  }
+  function NewDataReviewWorkspace({ source, reviewDemo }) {
+    const scenarios = reviewDemo?.scenarios || [];
+    const [activeScenarioId, setActiveScenarioId] = React.useState("NEW_LOG_APPEND");
+    const activeScenario = scenarios.find((item) => item.scenario_id === activeScenarioId) || scenarios[0];
+    if (!activeScenario) {
+      return /* @__PURE__ */ React.createElement("section", { className: "page-view" }, /* @__PURE__ */ React.createElement("div", { className: "review-demo-loading" }, "\u6B63\u5728\u8BFB\u53D6\u65B0\u6570\u636E\u5BA1\u6838\u89C4\u5219\u3002"));
+    }
+    return /* @__PURE__ */ React.createElement("section", { className: "page-view new-data-workspace" }, /* @__PURE__ */ React.createElement(
+      PageHeading,
+      {
+        eyebrow: "\u65B0\u6570\u636E\u5BA1\u6838",
+        title: "\u65B0\u6570\u636E\u5148\u6539\u53D8\u8BC1\u636E\u7248\u672C\uFF0C\u518D\u51B3\u5B9A\u54EA\u4E9B\u5206\u6790\u9700\u8981\u91CD\u5F00",
+        detail: "\u5BA1\u6838\u7684\u5BF9\u8C61\u662F\u6570\u636E\u80FD\u5426\u8FDB\u5165\u3001\u5F71\u54CD\u5230\u54EA\u91CC\u548C\u4E0B\u4E00\u6B65\u5141\u8BB8\u505A\u4EC0\u4E48\uFF0C\u4E0D\u662F\u8BA9 AI \u501F\u65B0\u6570\u636E\u76F4\u63A5\u6539\u5199\u6839\u56E0\u3002"
+      }
+    ), /* @__PURE__ */ React.createElement("div", { className: "new-data-boundary-band" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u4F01\u4E1A\u771F\u5B9E\u57FA\u7EBF"), /* @__PURE__ */ React.createElement("strong", null, source.metrics?.case_count ?? 10, " \u4E2A\u771F\u5B9E\u6848\u4F8B \xB7 ", source.metrics?.evidence_item_count ?? 146, " \u6761\u51BB\u7ED3\u8BC1\u636E")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u672C\u9875\u65B0\u589E\u5230\u8FBE\u9879"), /* @__PURE__ */ React.createElement("strong", null, "\u6F14\u793A\u65B0\u6570\u636E\uFF0C\u4E0D\u662F\u4F01\u4E1A\u65B0\u589E\u4E8B\u5B9E")), /* @__PURE__ */ React.createElement("p", null, "\u6F14\u793A\u8F93\u5165\u4E0D\u4F1A\u5199\u5165\u4F01\u4E1A\u6570\u636E\u5305\uFF0C\u4E5F\u4E0D\u4F1A\u6539\u53D8\u5F53\u524D\u5341\u6848\u7ED3\u8BBA\u3002")), /* @__PURE__ */ React.createElement("section", { className: "review-scenario-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u9009\u62E9\u4E00\u79CD\u65B0\u6570\u636E\u60C5\u51B5", detail: "\u540C\u4E00\u5957\u5BA1\u6838\u89C4\u5219\u4F1A\u6839\u636E\u6765\u6E90\u3001\u65F6\u5E8F\u3001\u51B2\u7A81\u548C\u98CE\u9669\u7ED9\u51FA\u4E0D\u540C\u52A8\u4F5C\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "review-scenario-tabs", role: "tablist", "aria-label": "\u65B0\u6570\u636E\u60C5\u51B5" }, scenarios.map((scenario) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        type: "button",
+        role: "tab",
+        "aria-selected": scenario.scenario_id === activeScenario.scenario_id,
+        className: scenario.scenario_id === activeScenario.scenario_id ? "active" : "",
+        key: scenario.scenario_id,
+        onClick: () => setActiveScenarioId(scenario.scenario_id)
+      },
+      /* @__PURE__ */ React.createElement("strong", null, scenario.title),
+      /* @__PURE__ */ React.createElement("span", null, scenario.subtitle)
+    )))), /* @__PURE__ */ React.createElement("section", { className: "review-case-summary" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", { className: "mono" }, activeScenario.case_id), /* @__PURE__ */ React.createElement("h2", null, activeScenario.title), /* @__PURE__ */ React.createElement("p", null, activeScenario.case_title)), /* @__PURE__ */ React.createElement("div", { className: `arrival-decision ${reviewTone(activeScenario.arrival_disposition)}` }, /* @__PURE__ */ React.createElement("span", null, "\u7CFB\u7EDF\u63A5\u6536\u51B3\u5B9A"), /* @__PURE__ */ React.createElement("strong", null, reviewLabel(activeScenario.arrival_disposition)), /* @__PURE__ */ React.createElement("small", null, "\u4ECE ", activeScenario.current_gate, " \u5F00\u59CB \xB7 ", rerunLabel(activeScenario.rerun_scope)))), /* @__PURE__ */ React.createElement("section", { className: "review-flow-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5BA1\u6838\u600E\u6837\u8FDB\u884C", detail: "\u6BCF\u4E00\u6B65\u90FD\u5F62\u6210\u53EF\u8FFD\u6EAF\u5DE5\u4EF6\uFF1B\u4EFB\u4F55\u4E00\u6B65\u5931\u8D25\u90FD\u4E0D\u80FD\u88AB\u540E\u7EED AI \u7ED5\u8FC7\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "review-flow-grid" }, /* @__PURE__ */ React.createElement(ReviewStep, { number: "01", title: "\u6765\u6E90\u4E0E\u5B8C\u6574\u6027\u95E8\u7981", result: reviewLabel(activeScenario.source_gate.state), detail: activeScenario.source_gate.detail, tone: reviewTone(activeScenario.source_gate.state) }), /* @__PURE__ */ React.createElement(ReviewStep, { number: "02A", title: "\u5B89\u5168\u5FEB\u901F\u8DEF\u5F84", result: reviewLabel(activeScenario.safety_path.state), detail: activeScenario.safety_path.detail, tone: reviewTone(activeScenario.safety_path.state) }), /* @__PURE__ */ React.createElement(ReviewStep, { number: "02B", title: "\u8BC1\u636E\u8D28\u91CF\u8DEF\u5F84", result: reviewLabel(activeScenario.quality_path.state), detail: activeScenario.quality_path.detail, tone: reviewTone(activeScenario.quality_path.state) }), /* @__PURE__ */ React.createElement(ReviewStep, { number: "03", title: "\u53D8\u5316\u5206\u7C7B", result: changeTypeLabel(activeScenario.change_type), detail: `\u4E8B\u4EF6\u65F6\u95F4\uFF1A${activeScenario.time_basis.event_time}\uFF1B\u5E73\u53F0\u83B7\u77E5\uFF1A${activeScenario.time_basis.received_at}\u3002` }), /* @__PURE__ */ React.createElement(ReviewStep, { number: "04", title: "\u7248\u672C\u4E0E\u5931\u6548\u8303\u56F4", result: activeScenario.version_effect.new_snapshot_becomes_current ? "\u521B\u5EFA\u65B0\u5FEB\u7167\u7248\u672C" : "\u5F53\u524D\u5FEB\u7167\u4E0D\u53D8", detail: activeScenario.version_effect.new_snapshot_becomes_current ? `\u53EA\u4F7F ${invalidatedLabel(activeScenario.invalidated_objects)} \u8FC7\u671F\u3002\u65E7\u5FEB\u7167\u6C38\u4E45\u4FDD\u7559\u3002` : "\u4E0D\u521B\u5EFA\u65B0 Evidence ID\uFF0C\u4E0D\u6539\u53D8\u5F53\u524D\u5019\u9009\u548C\u5BA1\u6838\u3002", tone: activeScenario.version_effect.new_snapshot_becomes_current ? "amber" : "green" }), /* @__PURE__ */ React.createElement(ReviewStep, { number: "05", title: "\u4F01\u4E1A\u4EBA\u5DE5\u95E8\u7981", result: activeScenario.human_review.required ? "\u9700\u8981\u4F01\u4E1A\u8D23\u4EFB\u4EBA\u5BA1\u6838" : "\u65E0\u9700\u4EBA\u5DE5\u653E\u884C", detail: activeScenario.human_review.question, tone: activeScenario.human_review.required ? "orange" : "green" }))), /* @__PURE__ */ React.createElement("div", { className: "review-decision-grid" }, /* @__PURE__ */ React.createElement("section", { className: "version-impact-panel" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u65E7\u7ED3\u8BBA\u600E\u6837\u5904\u7406", detail: "\u8FFD\u52A0\u548C\u5931\u6548\u4E0D\u7B49\u4E8E\u5220\u9664\u5386\u53F2\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "version-track" }, /* @__PURE__ */ React.createElement("div", { className: "version-item historical" }, /* @__PURE__ */ React.createElement("span", null, "\u65E7\u5FEB\u7167"), /* @__PURE__ */ React.createElement("strong", null, "\u6C38\u4E45\u4FDD\u7559"), /* @__PURE__ */ React.createElement("small", { className: "mono" }, shortSnapshot(activeScenario.baseline_snapshot_id))), /* @__PURE__ */ React.createElement("span", { className: "version-arrow", "aria-hidden": "true" }, "\u2192"), /* @__PURE__ */ React.createElement("div", { className: `version-item ${activeScenario.version_effect.new_snapshot_becomes_current ? "current" : "unchanged"}` }, /* @__PURE__ */ React.createElement("span", null, "\u5F53\u524D\u8EAB\u4EFD"), /* @__PURE__ */ React.createElement("strong", null, activeScenario.version_effect.new_snapshot_becomes_current ? "\u5BA1\u6838\u540E\u5207\u6362\u65B0\u7248\u672C" : "\u4FDD\u6301\u539F\u7248\u672C"), /* @__PURE__ */ React.createElement("small", null, activeScenario.review_reopen_status === "REOPEN_REQUIRED" ? "\u65E7\u5BA1\u6838\u53D8\u4E3A\u8FC7\u671F\uFF0C\u8981\u6C42\u91CD\u5F00" : "\u65E7\u5BA1\u6838\u7EE7\u7EED\u9002\u7528"))), /* @__PURE__ */ React.createElement("div", { className: "invalidated-line" }, /* @__PURE__ */ React.createElement("span", null, "\u53D7\u5F71\u54CD\u5DE5\u4EF6"), /* @__PURE__ */ React.createElement("strong", null, invalidatedLabel(activeScenario.invalidated_objects)))), /* @__PURE__ */ React.createElement("section", { className: "human-decision-panel" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u4F01\u4E1A\u8D23\u4EFB\u4EBA\u8981\u51B3\u5B9A\u4EC0\u4E48", detail: "\u4EBA\u6570\u548C\u804C\u8D23\u5206\u79BB\u65B9\u5F0F\u7531\u4F01\u4E1A\u73B0\u6709\u5236\u5EA6\u51B3\u5B9A\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "decision-question" }, activeScenario.human_review.question), activeScenario.human_review.decision_options.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "decision-options" }, activeScenario.human_review.decision_options.map((option) => /* @__PURE__ */ React.createElement("span", { key: option }, decisionOptionLabel(option)))), /* @__PURE__ */ React.createElement("div", { className: "approved-action" }, /* @__PURE__ */ React.createElement("span", null, "\u901A\u8FC7\u540E\u4EC5\u5141\u8BB8"), /* @__PURE__ */ React.createElement("strong", null, activeScenario.human_review.approved_action)), /* @__PURE__ */ React.createElement("div", { className: "next-owner" }, /* @__PURE__ */ React.createElement("span", null, "\u8D23\u4EFB\u4E3B\u4F53"), /* @__PURE__ */ React.createElement("strong", null, activeScenario.next_action.owner), /* @__PURE__ */ React.createElement("p", null, activeScenario.next_action.action)))), /* @__PURE__ */ React.createElement("section", { className: "minimal-rerun-band" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u6700\u5C0F\u91CD\u8DD1"), /* @__PURE__ */ React.createElement("strong", null, rerunLabel(activeScenario.rerun_scope))), /* @__PURE__ */ React.createElement("p", null, "\u53EA\u4ECE\u6700\u65E9\u53D7\u5F71\u54CD\u7684\u95E8\u7981\u5F00\u59CB\uFF0C\u672A\u4F9D\u8D56\u65B0\u6570\u636E\u7684\u5DE5\u4EF6\u53EF\u4EE5\u590D\u7528\uFF1B\u5B89\u5168\u901A\u77E5\u5355\u72EC\u5E42\u7B49\u5904\u7406\u3002"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u65E7\u5BA1\u6838\u9002\u7528\u6027"), /* @__PURE__ */ React.createElement("strong", null, applicabilityLabel(activeScenario.decision_applicability)))), /* @__PURE__ */ React.createElement("section", { className: "review-result-section" }, /* @__PURE__ */ React.createElement(SectionHeading, { title: "\u5BA1\u6838\u7ED3\u679C\uFF1A\u67E5\u4EC0\u4E48\u3001\u5F71\u54CD\u8C01\u3001\u7559\u4E0B\u4EC0\u4E48", detail: "\u8FD9\u56DB\u5757\u5185\u5BB9\u662F\u4F01\u4E1A\u63A5\u5165\u65B0\u6570\u636E\u540E\u53EF\u4EE5\u76F4\u63A5\u590D\u6838\u7684\u7ED3\u679C\uFF0C\u4E0D\u662F AI \u7684\u6700\u7EC8\u8BCA\u65AD\u3002" }), /* @__PURE__ */ React.createElement("div", { className: "review-result-grid" }, /* @__PURE__ */ React.createElement("section", { className: "result-panel checklist-panel" }, /* @__PURE__ */ React.createElement("div", { className: "result-panel-heading" }, /* @__PURE__ */ React.createElement("span", { className: "result-index" }, "A"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", null, "\u5BA1\u6838\u68C0\u67E5\u6E05\u5355"), /* @__PURE__ */ React.createElement("p", null, "\u6838\u5BF9\u4F01\u4E1A\u6765\u6E90\u6388\u6743\u3001\u6765\u6E90\u8BB0\u5F55 ID\u3001Schema \u4E0E\u89E3\u6790\u7248\u672C\u7B49\u516B\u9879\u5185\u5BB9\u3002"))), /* @__PURE__ */ React.createElement("div", { className: "review-checklist" }, activeScenario.review_checklist.map((item) => /* @__PURE__ */ React.createElement("div", { className: "checklist-row", key: item.check_id }, /* @__PURE__ */ React.createElement("span", { className: `check-status ${checkStatusTone(item.status)}` }, checkStatusLabel(item.status)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, item.label), /* @__PURE__ */ React.createElement("small", null, item.detail)))))), /* @__PURE__ */ React.createElement("section", { className: "result-panel artifact-panel" }, /* @__PURE__ */ React.createElement("div", { className: "result-panel-heading" }, /* @__PURE__ */ React.createElement("span", { className: "result-index" }, "B"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", null, "\u53D7\u5F71\u54CD\u5DE5\u4EF6\u6E05\u5355"), /* @__PURE__ */ React.createElement("p", null, "\u53EA\u8BA9\u771F\u6B63\u4F9D\u8D56\u65B0\u6570\u636E\u7684\u7ED3\u679C\u5931\u6548\u3002"))), /* @__PURE__ */ React.createElement("div", { className: "artifact-list" }, activeScenario.artifact_impact.items.map((item) => /* @__PURE__ */ React.createElement("div", { className: "artifact-row", key: item.artifact_id }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, item.label), /* @__PURE__ */ React.createElement("small", null, item.reason)), /* @__PURE__ */ React.createElement("span", { className: `artifact-status ${artifactStatusTone(item.status)}` }, artifactStatusLabel(item.status))))), /* @__PURE__ */ React.createElement("div", { className: "scope-reason" }, /* @__PURE__ */ React.createElement("span", null, "\u4E3A\u4EC0\u4E48\u4E0D\u662F\u5168\u6848\u91CD\u8DD1"), /* @__PURE__ */ React.createElement("p", null, activeScenario.artifact_impact.scope_reason))), /* @__PURE__ */ React.createElement("section", { className: "result-panel semantics-panel" }, /* @__PURE__ */ React.createElement("div", { className: "result-panel-heading" }, /* @__PURE__ */ React.createElement("span", { className: "result-index" }, "C"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", null, "\u4EBA\u5DE5\u51B3\u5B9A\u7684\u5B9E\u9645\u542B\u4E49"), /* @__PURE__ */ React.createElement("p", null, "\u4EBA\u5DE5\u6279\u51C6\u7684\u662F\u4E0B\u4E00\u6B65\u8FB9\u754C\uFF0C\u4E0D\u662F\u6839\u56E0\u3002"))), /* @__PURE__ */ React.createElement("div", { className: "decision-semantics-list" }, activeScenario.decision_semantics.length ? activeScenario.decision_semantics.map((item) => /* @__PURE__ */ React.createElement("div", { className: "decision-semantics", key: item.option }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, item.label), /* @__PURE__ */ React.createElement("span", null, item.meaning)), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("b", null, "\u5141\u8BB8\uFF1A"), item.permits), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("b", null, "\u7981\u6B62\uFF1A"), item.prohibits))) : /* @__PURE__ */ React.createElement("div", { className: "no-human-decision" }, "\u672C\u573A\u666F\u6309\u5E42\u7B49\u6216\u6765\u6E90\u6392\u9664\u89C4\u5219\u5904\u7406\uFF0C\u4E0D\u9700\u8981\u4F01\u4E1A\u4EBA\u5DE5\u653E\u884C\u3002"))), /* @__PURE__ */ React.createElement("section", { className: "result-panel audit-preview-panel" }, /* @__PURE__ */ React.createElement("div", { className: "result-panel-heading" }, /* @__PURE__ */ React.createElement("span", { className: "result-index" }, "D"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", null, "\u53EF\u5BA1\u8BA1\u8BB0\u5F55\u9884\u89C8"), /* @__PURE__ */ React.createElement("p", null, "\u6F14\u793A\u8BB0\u5F55\uFF0C\u4E0D\u662F\u771F\u5B9E\u4F01\u4E1A\u5BA1\u6279\u8BB0\u5F55\u3002"))), /* @__PURE__ */ React.createElement("div", { className: "audit-record-grid" }, /* @__PURE__ */ React.createElement(AuditRecordField, { label: "\u8BB0\u5F55\u7C7B\u578B", value: "\u6F14\u793A\u5BA1\u6838\u8BB0\u5F55" }), /* @__PURE__ */ React.createElement(AuditRecordField, { label: "Case", value: activeScenario.audit_record_preview.case_id, mono: true }), /* @__PURE__ */ React.createElement(AuditRecordField, { label: "\u57FA\u7EBF\u5FEB\u7167", value: shortSnapshot(activeScenario.audit_record_preview.baseline_snapshot_id), mono: true }), /* @__PURE__ */ React.createElement(AuditRecordField, { label: "\u5230\u8FBE\u51B3\u5B9A", value: reviewLabel(activeScenario.audit_record_preview.arrival_disposition) }), /* @__PURE__ */ React.createElement(AuditRecordField, { label: "\u5931\u6548\u5BF9\u8C61", value: invalidatedLabel(activeScenario.audit_record_preview.invalidated_artifacts) }), /* @__PURE__ */ React.createElement(AuditRecordField, { label: "\u6700\u5C0F\u4E0B\u4E00\u6B65", value: activeScenario.audit_record_preview.next_action })), /* @__PURE__ */ React.createElement("div", { className: "audit-record-boundary" }, /* @__PURE__ */ React.createElement("span", null, "\u4EBA\u5DE5\u6279\u51C6\u4E0E\u7B7E\u540D"), /* @__PURE__ */ React.createElement("strong", null, "\u5F85\u4F01\u4E1A\u771F\u5B9E\u5BA1\u6838\u4EA7\u751F"), /* @__PURE__ */ React.createElement("small", null, "\u672C\u9875\u4E0D\u751F\u6210\u771F\u5B9E\u5BA1\u6838\u4EBA\u3001\u7B7E\u540D\u6216\u4F01\u4E1A\u5BA1\u6279\u4E8B\u5B9E\u3002"))))), /* @__PURE__ */ React.createElement("div", { className: "new-data-final-boundary" }, "\u5BA1\u6838\u901A\u8FC7\u4E0D\u4EE3\u8868\u6839\u56E0\u6210\u7ACB\uFF0C\u4E5F\u4E0D\u5141\u8BB8\u7CFB\u7EDF\u81EA\u52A8\u53D1\u5E03\u3001\u81EA\u52A8\u56DE\u6EDA\u6216\u81EA\u52A8\u5173\u95ED Case\u3002"));
+  }
+  function ReviewStep({ number, title, result, detail, tone = "" }) {
+    return /* @__PURE__ */ React.createElement("article", { className: `review-step ${tone}` }, /* @__PURE__ */ React.createElement("span", { className: "mono" }, number), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", null, title), /* @__PURE__ */ React.createElement("strong", null, result), /* @__PURE__ */ React.createElement("p", null, detail)));
+  }
+  function AuditRecordField({ label, value, mono = false }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "audit-record-field" }, /* @__PURE__ */ React.createElement("span", null, label), /* @__PURE__ */ React.createElement("strong", { className: mono ? "mono" : "" }, value));
+  }
+  function reviewLabel(value) {
+    return REVIEW_STATE_LABELS[value] || value;
+  }
+  function reviewTone(value) {
+    if (["ACCEPT_APPEND", "DUPLICATE_NOOP", "NORMAL"].includes(value)) return "green";
+    if (["LATE_APPEND_REOPEN", "SAFETY_HOLD"].includes(value)) return "red";
+    if (["CONFLICT_PENDING", "REVIEW_REQUIRED", "CONFLICT_SET_CREATED"].includes(value)) return "amber";
+    if (value === "EXCLUDED_NON_ENTERPRISE") return "muted";
+    return "cyan";
+  }
+  function rerunLabel(scope) {
+    return { NONE: "\u65E0\u9700\u91CD\u8DD1", MINIMAL: "\u5355\u5DE5\u4EF6\u91CD\u8DD1", PARTIAL: "\u4ECE\u53D7\u5F71\u54CD\u95E8\u7981\u90E8\u5206\u91CD\u8DD1", FULL_CASE_REVIEW: "\u5168\u6848\u91CD\u65B0\u5BA1\u6838" }[scope] || scope;
+  }
+  function changeTypeLabel(type) {
+    return { ADDITIVE_EVIDENCE: "\u8FFD\u52A0\u8BC1\u636E", SOURCE_CONFLICT: "\u6765\u6E90\u51B2\u7A81", HISTORICAL_REFERENCE: "\u975E\u5F53\u524D\u8BC1\u636E\u53C2\u8003" }[type] || type;
+  }
+  function invalidatedLabel(items) {
+    const labels = { CandidateSet: "\u5019\u9009\u96C6", DiagnosisReview: "\u8BCA\u65AD\u5BA1\u6838", SafetyReviewApplicability: "\u5B89\u5168\u5BA1\u6838\u9002\u7528\u6027", ValidationReadiness: "\u9A8C\u8BC1\u51C6\u5165\u72B6\u6001" };
+    return items.length ? items.map((item) => labels[item] || item).join("\u3001") : "\u65E0";
+  }
+  function decisionOptionLabel(option) {
+    return { APPROVE: "\u6279\u51C6\u53D7\u9650\u52A8\u4F5C", RECORD_LIMIT: "\u8BB0\u5F55\u9650\u5236", REJECT: "\u9A73\u56DE", PAUSE: "\u6682\u505C", ESCALATE: "\u5347\u7EA7\u8D23\u4EFB\u4EBA" }[option] || option;
+  }
+  function checkStatusLabel(status) {
+    return { PASS: "\u901A\u8FC7", REVIEW: "\u590D\u6838", FAIL: "\u5931\u8D25", NOT_APPLICABLE: "\u4E0D\u9002\u7528" }[status] || status;
+  }
+  function checkStatusTone(status) {
+    return { PASS: "green", REVIEW: "amber", FAIL: "red", NOT_APPLICABLE: "muted" }[status] || "muted";
+  }
+  function artifactStatusLabel(status) {
+    return { VALID: "\u4FDD\u6301\u6709\u6548", NEW_CURRENT: "\u65B0\u5F53\u524D", STALE: "\u5DF2\u8FC7\u671F", SUSPENDED: "\u5DF2\u6682\u505C", EXCLUDED: "\u672A\u5EFA\u7ACB" }[status] || status;
+  }
+  function artifactStatusTone(status) {
+    return { VALID: "green", NEW_CURRENT: "cyan", STALE: "amber", SUSPENDED: "red", EXCLUDED: "muted" }[status] || "muted";
+  }
+  function applicabilityLabel(value) {
+    return { CURRENT: "\u7EE7\u7EED\u6709\u6548", STALE: "\u8FC7\u671F\uFF0C\u5F85\u91CD\u5F00", SUSPENDED: "\u6682\u505C\u9002\u7528" }[value] || value;
+  }
+  function shortSnapshot(snapshotId) {
+    const value = String(snapshotId || "");
+    return value.length > 30 ? `${value.slice(0, 22)}...${value.slice(-8)}` : value;
+  }
+  function RouteStatus({ status = "NOT_EVALUABLE_WITH_CURRENT_DATA", compact = false }) {
+    return /* @__PURE__ */ React.createElement("span", { className: `route-status ${status} ${compact ? "compact" : ""}`, title: status }, ROUTE_STATUS_LABELS[status] || status);
+  }
+  function branchDisplayTitle(node) {
+    if (node.node_id === "G3_SCENARIO_RECONSTRUCTION") return "\u573A\u666F\u91CD\u5EFA\u5206\u652F";
+    if (node.node_id === "G3_OTA_GATE") return "OTA \u56E0\u679C\u95E8\u7981\u5206\u652F";
+    if (node.node_id === "G3_HISTORY_REFERENCE") return "\u5386\u53F2\u6848\u4F8B\u53C2\u8003\u5206\u652F";
+    return node.title;
+  }
+  function MethodDatum({ value, label, tone = "" }) {
+    return /* @__PURE__ */ React.createElement("div", { className: `method-datum ${tone}` }, /* @__PURE__ */ React.createElement("strong", null, value), /* @__PURE__ */ React.createElement("span", null, label));
+  }
+  function MethodChange({ finding, risk, rule }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "method-change-row" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u771F\u5B9E\u53D1\u73B0"), /* @__PURE__ */ React.createElement("strong", null, finding)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u539F\u6709\u98CE\u9669"), /* @__PURE__ */ React.createElement("p", null, risk)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("span", null, "\u65B9\u6CD5\u89C4\u5219"), /* @__PURE__ */ React.createElement("p", null, rule)));
+  }
+  function PageHeading({ eyebrow, title, detail }) {
+    return /* @__PURE__ */ React.createElement("header", { className: "page-heading" }, /* @__PURE__ */ React.createElement("span", null, eyebrow), /* @__PURE__ */ React.createElement("h1", null, title), /* @__PURE__ */ React.createElement("p", null, detail));
+  }
+  function SectionHeading({ title, detail }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "section-heading" }, /* @__PURE__ */ React.createElement("h2", null, title), /* @__PURE__ */ React.createElement("p", null, detail));
+  }
+  function KeyValue({ label, value, mono = false }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "key-value" }, /* @__PURE__ */ React.createElement("span", null, label), /* @__PURE__ */ React.createElement("strong", { className: mono ? "mono" : "" }, value));
+  }
+  function ObservationTable({ observations }) {
+    return /* @__PURE__ */ React.createElement("div", { className: "observation-table", role: "table", "aria-label": "\u6D3E\u751F\u89C2\u5BDF" }, /* @__PURE__ */ React.createElement("div", { className: "observation-row observation-head", role: "row" }, /* @__PURE__ */ React.createElement("span", null, "\u68C0\u67E5\u9879"), /* @__PURE__ */ React.createElement("span", null, "\u529F\u80FD\u57DF"), /* @__PURE__ */ React.createElement("span", null, "\u72B6\u6001"), /* @__PURE__ */ React.createElement("span", null, "\u65F6\u95F4\u8BED\u4E49"), /* @__PURE__ */ React.createElement("span", null, "Evidence ID")), observations.map((item) => /* @__PURE__ */ React.createElement("div", { className: "observation-row", role: "row", key: `${item.evaluator}-${item.evidence_ids[0]}` }, /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("strong", null, item.evaluator), /* @__PURE__ */ React.createElement("small", null, item.check_pattern || "\u672A\u63D0\u4F9B\u68C0\u67E5\u6A21\u5F0F")), /* @__PURE__ */ React.createElement("span", null, item.domain), /* @__PURE__ */ React.createElement("span", { className: `observation-status ${item.status}` }, OBSERVATION_LABELS[item.status]), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("small", null, item.window_status), /* @__PURE__ */ React.createElement("small", null, item.temporal_binding)), /* @__PURE__ */ React.createElement("span", { className: "mono evidence-id" }, item.evidence_ids.join(", ")))));
+  }
+  function paragraphs(value) {
+    return String(value).split("\n").filter(Boolean).map((line) => /* @__PURE__ */ React.createElement("p", { key: line }, line));
+  }
+  function caseDecisionLabel(caseItem) {
+    if (caseItem.safety_route === "SAFETY_PRIORITY_REVIEW") return "\u5B89\u5168\u4F18\u5148 + \u505C\u7B54";
+    if (caseItem.evidence_tension_state === "EVIDENCE_TENSION") return "\u8BC1\u636E\u5F20\u529B + \u505C\u7B54";
+    return ANALYSIS_LABELS[caseItem.analysis_state] || "\u5F85\u65B9\u6CD5\u5224\u65AD";
+  }
+  function stateTone(caseItem) {
+    if (caseItem.safety_route === "SAFETY_PRIORITY_REVIEW") return "red";
+    if (caseItem.evidence_tension_state === "EVIDENCE_TENSION") return "cyan";
+    return caseItem.analysis_state === "LIMITED_CANDIDATES_READY" ? "green" : "amber";
+  }
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(/* @__PURE__ */ React.createElement(App, null));
+})();

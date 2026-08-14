@@ -1,0 +1,1053 @@
+{
+  "schema_version": "new-data-review-demo/v1",
+  "data_authority": "ENTERPRISE_PROVIDED_BASELINE_ONLY",
+  "new_arrival_data_class": "DEMO_INPUT_SYNTHETIC",
+  "demo_boundary": "演示新增到达项不属于企业新增事实，不写入企业数据包。",
+  "baseline": {
+    "data_class": "REAL_CASE_DERIVED_DEIDENTIFIED",
+    "case_count": 10,
+    "evidence_item_count": 146,
+    "current_snapshot_rule": "PUB-CASE-SNAPSHOT-V1"
+  },
+  "review_principles": [
+    "先审来源、哈希、Case 归属和时间语义，再决定用途。",
+    "安全快速路径和证据质量路径并行，不互相替代。",
+    "旧快照和旧审核永久保留；变化只使依赖旧输入的工件过期。",
+    "企业责任人审核最小重跑或暂停动作，不确认根因。"
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "NEW_LOG_APPEND",
+      "title": "企业授权新增日志",
+      "subtitle": "同一 Case 新增一段可追溯的日志记录",
+      "demo_input": true,
+      "case_id": "RCA-EXT-001",
+      "case_title": "ACC-跟停前车静止车，车速65，刹车晚，有恐慌感",
+      "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+      "change_type": "ADDITIVE_EVIDENCE",
+      "arrival_disposition": "ACCEPT_APPEND",
+      "current_gate": "G2",
+      "rerun_scope": "PARTIAL",
+      "source_gate": {
+        "state": "PASS",
+        "detail": "Case、来源记录、内容哈希和时间字段可追溯。"
+      },
+      "safety_path": {
+        "state": "NORMAL",
+        "detail": "没有新增的即时安全暴露，保持既有安全流程。"
+      },
+      "quality_path": {
+        "state": "ACCEPT_APPEND",
+        "detail": "允许把新记录追加到证据链，建立新的当前快照。"
+      },
+      "time_basis": {
+        "event_time": "演示时间窗内",
+        "received_at": "演示接收时间",
+        "watermark_relation": "ON_TIME"
+      },
+      "version_effect": {
+        "old_snapshot_id": "PUB-CASE-SNAPSHOT-V1",
+        "old_snapshot_preserved": true,
+        "new_snapshot_becomes_current": true,
+        "old_review_preserved": true,
+        "current_snapshot_state": "PUB-CASE-SNAPSHOT-V1"
+      },
+      "invalidated_objects": [
+        "CandidateSet",
+        "DiagnosisReview"
+      ],
+      "decision_applicability": "STALE",
+      "review_reopen_status": "REOPEN_REQUIRED",
+      "conflict_resolution": "NOT_APPLICABLE",
+      "human_review": {
+        "required": true,
+        "phase": "diagnosis",
+        "decision_options": [
+          "APPROVE",
+          "RECORD_LIMIT",
+          "REJECT",
+          "PAUSE"
+        ],
+        "question": "是否接受这条企业授权记录，并批准从 G2 开始对受影响候选进行受限重跑？",
+        "approved_action": "生成新证据快照，重跑候选整理，再提交新的诊断审核包。",
+        "reviewer_count_policy": "ENTERPRISE_DEFINED"
+      },
+      "next_action": {
+        "owner": "企业责任人",
+        "action": "核对新记录的来源和影响范围后，决定是否放行受限重跑。"
+      },
+      "root_cause_claim_allowed": false,
+      "ota_causality_claim_allowed": false,
+      "forbidden_claims": [
+        "不得确认根因",
+        "不得确认 OTA 因果",
+        "不得自动发布",
+        "不得自动回滚",
+        "不得自动关闭 Case"
+      ],
+      "review_checklist": [
+        {
+          "check_id": "SOURCE_AUTHORIZATION",
+          "label": "企业来源授权",
+          "purpose": "确认材料来自企业授权数据源，而不是公开、演示或未知来源。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CASE_BINDING",
+          "label": "Case 归属",
+          "purpose": "确认记录能绑定到一个已存在的企业 Case，不能凭相似描述归并。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SOURCE_RECORD_ID",
+          "label": "来源记录 ID",
+          "purpose": "确认原始系统记录有稳定 ID，后续可以定位同一条记录。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONTENT_HASH",
+          "label": "内容哈希",
+          "purpose": "确认内容哈希可复算，用于发现篡改和重复到达。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "TIME_SEMANTICS",
+          "label": "事件时间与接收时间",
+          "purpose": "分开记录事件发生时间、平台接收时间和冻结窗口关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SCHEMA_PARSER",
+          "label": "Schema 与解析版本",
+          "purpose": "确认字段按照已知 Schema 和解析版本解释，避免版本差异被当成事实变化。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONFLICT_AND_SAFETY",
+          "label": "冲突与安全信号",
+          "purpose": "检查同一事实是否冲突，以及是否触发现有安全责任流程。",
+          "status": "PASS",
+          "detail": "未发现需要改变当前路径的来源冲突；安全信号按现有规则单独处理。"
+        },
+        {
+          "check_id": "CURRENT_SNAPSHOT",
+          "label": "当前快照身份",
+          "purpose": "确认追加对象、旧快照和旧审核之间的版本关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        }
+      ],
+      "artifact_impact": {
+        "rerun_from_gate": "G2",
+        "scope_reason": "只重跑依赖新数据的工件；未依赖新数据的来源审计和历史快照可以复用，不做全案重跑。",
+        "items": [
+          {
+            "artifact_id": "SOURCE_AUDIT",
+            "label": "来源审计",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "EVIDENCE_SNAPSHOT",
+            "label": "证据快照",
+            "status": "NEW_CURRENT",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "CANDIDATE_SET",
+            "label": "候选集",
+            "status": "STALE",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "DIAGNOSIS_REVIEW",
+            "label": "诊断审核",
+            "status": "STALE",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "SAFETY_REVIEW_APPLICABILITY",
+            "label": "安全审核适用性",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "VALIDATION_READINESS",
+            "label": "验证准入状态",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          }
+        ]
+      },
+      "decision_semantics": [
+        {
+          "option": "APPROVE",
+          "label": "批准受限动作",
+          "meaning": "批准已写明范围的证据接收或最小重跑动作。",
+          "permits": "只允许按指定 Case、门禁和工件执行下一步。",
+          "prohibits": "不批准根因、OTA 因果、发布、回滚或关闭。"
+        },
+        {
+          "option": "RECORD_LIMIT",
+          "label": "记录限制",
+          "meaning": "接受记录，但把时间、来源、字段或使用范围限制写入审核记录。",
+          "permits": "允许在限制条件内保留或重跑相关分析。",
+          "prohibits": "不允许把受限观察当成完整事实或确定性结论。"
+        },
+        {
+          "option": "REJECT",
+          "label": "驳回",
+          "meaning": "拒绝该到达项进入当前企业证据快照。",
+          "permits": "保留拒绝原因和到达痕迹，继续使用原快照。",
+          "prohibits": "不允许用被驳回材料改变候选、审核或验证状态。"
+        },
+        {
+          "option": "PAUSE",
+          "label": "暂停",
+          "meaning": "暂停受影响结论的适用性，等待企业补证或责任人处理。",
+          "permits": "允许保留历史并标记暂停范围。",
+          "prohibits": "不允许继续沿用暂停范围内的旧结论，也不自动推进后续门禁。"
+        }
+      ],
+      "audit_record_preview": {
+        "record_class": "DEMO_REVIEW_RECORD",
+        "case_id": "RCA-EXT-001",
+        "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+        "arrival_disposition": "ACCEPT_APPEND",
+        "checklist_result": "PASS",
+        "safety_path": "NORMAL",
+        "quality_path": "ACCEPT_APPEND",
+        "invalidated_artifacts": [
+          "CandidateSet",
+          "DiagnosisReview"
+        ],
+        "rerun_from_gate": "G2",
+        "next_action": "核对新记录的来源和影响范围后，决定是否放行受限重跑。",
+        "human_decision": null,
+        "reviewer_identity": null,
+        "signature": null,
+        "enterprise_approval_fact": false,
+        "record_boundary": "这是演示审核记录预览，不是真实企业审批记录；不生成审核人、签名或批准事实。"
+      }
+    },
+    {
+      "scenario_id": "LATE_SAFETY_SIGNAL",
+      "title": "迟到的高风险信号",
+      "subtitle": "事件时间早于已冻结窗口，且提示可能需要安全关注",
+      "demo_input": true,
+      "case_id": "RCA-EXT-008",
+      "case_title": "LCC-跟随前车，双线变成单线车道，未延单线控车，撞向护栏",
+      "baseline_snapshot_id": "PUB-RCA-EXT-008-SNAPSHOT-V1",
+      "change_type": "ADDITIVE_EVIDENCE",
+      "arrival_disposition": "LATE_APPEND_REOPEN",
+      "current_gate": "G2",
+      "rerun_scope": "PARTIAL",
+      "source_gate": {
+        "state": "PASS",
+        "detail": "来源身份和哈希可验证，但记录迟到到达。"
+      },
+      "safety_path": {
+        "state": "SAFETY_HOLD",
+        "detail": "先暂停旧审核结论的适用性，并升级给企业既有安全责任流程。"
+      },
+      "quality_path": {
+        "state": "ACCEPT_WITH_TIME_LIMIT",
+        "detail": "可以追加为新版本，但时间坐标限制必须留在审核包中。"
+      },
+      "time_basis": {
+        "event_time": "早于当前冻结窗口",
+        "received_at": "演示接收时间",
+        "watermark_relation": "LATE_AFTER_FREEZE"
+      },
+      "version_effect": {
+        "old_snapshot_id": "PUB-CASE-SNAPSHOT-V1",
+        "old_snapshot_preserved": true,
+        "new_snapshot_becomes_current": true,
+        "old_review_preserved": true,
+        "current_snapshot_state": "PUB-CASE-SNAPSHOT-V1"
+      },
+      "invalidated_objects": [
+        "CandidateSet",
+        "DiagnosisReview",
+        "SafetyReviewApplicability"
+      ],
+      "decision_applicability": "SUSPENDED",
+      "review_reopen_status": "REOPEN_REQUIRED",
+      "conflict_resolution": "NOT_APPLICABLE",
+      "human_review": {
+        "required": true,
+        "phase": "diagnosis",
+        "decision_options": [
+          "ESCALATE",
+          "PAUSE",
+          "APPROVE",
+          "RECORD_LIMIT"
+        ],
+        "question": "是否维持安全暂停，并批准在时间限制下重开受影响分析？",
+        "approved_action": "安全处置与证据重跑并行；任何候选仍需在新快照上重新审核。",
+        "reviewer_count_policy": "ENTERPRISE_DEFINED"
+      },
+      "next_action": {
+        "owner": "企业安全与工程责任人",
+        "action": "按企业现有安全流程处理暂停，同时审核迟到记录的重开范围。"
+      },
+      "root_cause_claim_allowed": false,
+      "ota_causality_claim_allowed": false,
+      "forbidden_claims": [
+        "不得确认根因",
+        "不得确认 OTA 因果",
+        "不得自动发布",
+        "不得自动回滚",
+        "不得自动关闭 Case"
+      ],
+      "review_checklist": [
+        {
+          "check_id": "SOURCE_AUTHORIZATION",
+          "label": "企业来源授权",
+          "purpose": "确认材料来自企业授权数据源，而不是公开、演示或未知来源。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CASE_BINDING",
+          "label": "Case 归属",
+          "purpose": "确认记录能绑定到一个已存在的企业 Case，不能凭相似描述归并。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SOURCE_RECORD_ID",
+          "label": "来源记录 ID",
+          "purpose": "确认原始系统记录有稳定 ID，后续可以定位同一条记录。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONTENT_HASH",
+          "label": "内容哈希",
+          "purpose": "确认内容哈希可复算，用于发现篡改和重复到达。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "TIME_SEMANTICS",
+          "label": "事件时间与接收时间",
+          "purpose": "分开记录事件发生时间、平台接收时间和冻结窗口关系。",
+          "status": "REVIEW",
+          "detail": "事件时间早于冻结窗口，接收时间和事件时间不能混用，旧审核适用性需暂停。"
+        },
+        {
+          "check_id": "SCHEMA_PARSER",
+          "label": "Schema 与解析版本",
+          "purpose": "确认字段按照已知 Schema 和解析版本解释，避免版本差异被当成事实变化。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONFLICT_AND_SAFETY",
+          "label": "冲突与安全信号",
+          "purpose": "检查同一事实是否冲突，以及是否触发现有安全责任流程。",
+          "status": "PASS",
+          "detail": "未发现需要改变当前路径的来源冲突；安全信号按现有规则单独处理。"
+        },
+        {
+          "check_id": "CURRENT_SNAPSHOT",
+          "label": "当前快照身份",
+          "purpose": "确认追加对象、旧快照和旧审核之间的版本关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        }
+      ],
+      "artifact_impact": {
+        "rerun_from_gate": "G2",
+        "scope_reason": "只重跑依赖新数据的工件；未依赖新数据的来源审计和历史快照可以复用，不做全案重跑。",
+        "items": [
+          {
+            "artifact_id": "SOURCE_AUDIT",
+            "label": "来源审计",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "EVIDENCE_SNAPSHOT",
+            "label": "证据快照",
+            "status": "NEW_CURRENT",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "CANDIDATE_SET",
+            "label": "候选集",
+            "status": "SUSPENDED",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "DIAGNOSIS_REVIEW",
+            "label": "诊断审核",
+            "status": "SUSPENDED",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "SAFETY_REVIEW_APPLICABILITY",
+            "label": "安全审核适用性",
+            "status": "SUSPENDED",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "VALIDATION_READINESS",
+            "label": "验证准入状态",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          }
+        ]
+      },
+      "decision_semantics": [
+        {
+          "option": "ESCALATE",
+          "label": "升级责任人",
+          "meaning": "把安全、冲突或权限问题升级给企业指定责任流程。",
+          "permits": "允许企业安全或工程流程先行处置，并记录升级边界。",
+          "prohibits": "不允许 AI 以升级结果替代人工判断或确认根因。"
+        },
+        {
+          "option": "PAUSE",
+          "label": "暂停",
+          "meaning": "暂停受影响结论的适用性，等待企业补证或责任人处理。",
+          "permits": "允许保留历史并标记暂停范围。",
+          "prohibits": "不允许继续沿用暂停范围内的旧结论，也不自动推进后续门禁。"
+        },
+        {
+          "option": "APPROVE",
+          "label": "批准受限动作",
+          "meaning": "批准已写明范围的证据接收或最小重跑动作。",
+          "permits": "只允许按指定 Case、门禁和工件执行下一步。",
+          "prohibits": "不批准根因、OTA 因果、发布、回滚或关闭。"
+        },
+        {
+          "option": "RECORD_LIMIT",
+          "label": "记录限制",
+          "meaning": "接受记录，但把时间、来源、字段或使用范围限制写入审核记录。",
+          "permits": "允许在限制条件内保留或重跑相关分析。",
+          "prohibits": "不允许把受限观察当成完整事实或确定性结论。"
+        }
+      ],
+      "audit_record_preview": {
+        "record_class": "DEMO_REVIEW_RECORD",
+        "case_id": "RCA-EXT-008",
+        "baseline_snapshot_id": "PUB-RCA-EXT-008-SNAPSHOT-V1",
+        "arrival_disposition": "LATE_APPEND_REOPEN",
+        "checklist_result": "PASS",
+        "safety_path": "SAFETY_HOLD",
+        "quality_path": "ACCEPT_WITH_TIME_LIMIT",
+        "invalidated_artifacts": [
+          "CandidateSet",
+          "DiagnosisReview",
+          "SafetyReviewApplicability"
+        ],
+        "rerun_from_gate": "G2",
+        "next_action": "按企业现有安全流程处理暂停，同时审核迟到记录的重开范围。",
+        "human_decision": null,
+        "reviewer_identity": null,
+        "signature": null,
+        "enterprise_approval_fact": false,
+        "record_boundary": "这是演示审核记录预览，不是真实企业审批记录；不生成审核人、签名或批准事实。"
+      }
+    },
+    {
+      "scenario_id": "SOURCE_CONFLICT",
+      "title": "同一事实出现来源冲突",
+      "subtitle": "两个可追溯来源对同一事实键给出不兼容观察",
+      "demo_input": true,
+      "case_id": "RCA-EXT-004",
+      "case_title": "ACC-ACC，跟停前面静止车辆，无刹车迹象",
+      "baseline_snapshot_id": "PUB-RCA-EXT-004-SNAPSHOT-V1",
+      "change_type": "SOURCE_CONFLICT",
+      "arrival_disposition": "CONFLICT_PENDING",
+      "current_gate": "G2",
+      "rerun_scope": "FULL_CASE_REVIEW",
+      "source_gate": {
+        "state": "CONFLICT_PENDING",
+        "detail": "来源可追溯，但同一事实键存在不能自动裁决的差异。"
+      },
+      "safety_path": {
+        "state": "REVIEW_REQUIRED",
+        "detail": "当前没有新增安全事实；如企业风险规则要求，可升级既有流程。"
+      },
+      "quality_path": {
+        "state": "CONFLICT_SET_CREATED",
+        "detail": "建立冲突集并保留双方，不允许按模型置信度选择一方。"
+      },
+      "time_basis": {
+        "event_time": "演示时间窗内",
+        "received_at": "演示接收时间",
+        "watermark_relation": "UNKNOWN"
+      },
+      "version_effect": {
+        "old_snapshot_id": "PUB-CASE-SNAPSHOT-V1",
+        "old_snapshot_preserved": true,
+        "new_snapshot_becomes_current": true,
+        "old_review_preserved": true,
+        "current_snapshot_state": "PUB-CASE-SNAPSHOT-V1"
+      },
+      "invalidated_objects": [
+        "CandidateSet",
+        "DiagnosisReview",
+        "ValidationReadiness"
+      ],
+      "decision_applicability": "SUSPENDED",
+      "review_reopen_status": "REOPEN_REQUIRED",
+      "conflict_resolution": "UNRESOLVED_KEEP_BOTH",
+      "human_review": {
+        "required": true,
+        "phase": "diagnosis",
+        "decision_options": [
+          "PAUSE",
+          "ESCALATE",
+          "RECORD_LIMIT",
+          "REJECT"
+        ],
+        "question": "冲突集是否足以暂停相关结论，并指定企业制度下的冲突复核责任人？",
+        "approved_action": "保留双方观察，限制相关候选用途，完成冲突复核后再决定是否重跑。",
+        "reviewer_count_policy": "ENTERPRISE_DEFINED"
+      },
+      "next_action": {
+        "owner": "企业责任人",
+        "action": "审核冲突集和受影响范围，决定暂停或升级，不选择“哪一方更像真相”。"
+      },
+      "root_cause_claim_allowed": false,
+      "ota_causality_claim_allowed": false,
+      "forbidden_claims": [
+        "不得确认根因",
+        "不得确认 OTA 因果",
+        "不得自动发布",
+        "不得自动回滚",
+        "不得自动关闭 Case"
+      ],
+      "review_checklist": [
+        {
+          "check_id": "SOURCE_AUTHORIZATION",
+          "label": "企业来源授权",
+          "purpose": "确认材料来自企业授权数据源，而不是公开、演示或未知来源。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CASE_BINDING",
+          "label": "Case 归属",
+          "purpose": "确认记录能绑定到一个已存在的企业 Case，不能凭相似描述归并。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SOURCE_RECORD_ID",
+          "label": "来源记录 ID",
+          "purpose": "确认原始系统记录有稳定 ID，后续可以定位同一条记录。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONTENT_HASH",
+          "label": "内容哈希",
+          "purpose": "确认内容哈希可复算，用于发现篡改和重复到达。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "TIME_SEMANTICS",
+          "label": "事件时间与接收时间",
+          "purpose": "分开记录事件发生时间、平台接收时间和冻结窗口关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SCHEMA_PARSER",
+          "label": "Schema 与解析版本",
+          "purpose": "确认字段按照已知 Schema 和解析版本解释，避免版本差异被当成事实变化。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONFLICT_AND_SAFETY",
+          "label": "冲突与安全信号",
+          "purpose": "检查同一事实是否冲突，以及是否触发现有安全责任流程。",
+          "status": "REVIEW",
+          "detail": "发现同一事实键存在不能自动裁决的来源差异，必须保留双方并交人工复核。"
+        },
+        {
+          "check_id": "CURRENT_SNAPSHOT",
+          "label": "当前快照身份",
+          "purpose": "确认追加对象、旧快照和旧审核之间的版本关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        }
+      ],
+      "artifact_impact": {
+        "rerun_from_gate": "G2",
+        "scope_reason": "只重跑依赖新数据的工件；未依赖新数据的来源审计和历史快照可以复用，不做全案重跑。",
+        "items": [
+          {
+            "artifact_id": "SOURCE_AUDIT",
+            "label": "来源审计",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "EVIDENCE_SNAPSHOT",
+            "label": "证据快照",
+            "status": "NEW_CURRENT",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "CANDIDATE_SET",
+            "label": "候选集",
+            "status": "SUSPENDED",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "DIAGNOSIS_REVIEW",
+            "label": "诊断审核",
+            "status": "SUSPENDED",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          },
+          {
+            "artifact_id": "SAFETY_REVIEW_APPLICABILITY",
+            "label": "安全审核适用性",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "VALIDATION_READINESS",
+            "label": "验证准入状态",
+            "status": "STALE",
+            "reason": "依赖旧输入，当前适用性需要按新快照重新判断。"
+          }
+        ]
+      },
+      "decision_semantics": [
+        {
+          "option": "PAUSE",
+          "label": "暂停",
+          "meaning": "暂停受影响结论的适用性，等待企业补证或责任人处理。",
+          "permits": "允许保留历史并标记暂停范围。",
+          "prohibits": "不允许继续沿用暂停范围内的旧结论，也不自动推进后续门禁。"
+        },
+        {
+          "option": "ESCALATE",
+          "label": "升级责任人",
+          "meaning": "把安全、冲突或权限问题升级给企业指定责任流程。",
+          "permits": "允许企业安全或工程流程先行处置，并记录升级边界。",
+          "prohibits": "不允许 AI 以升级结果替代人工判断或确认根因。"
+        },
+        {
+          "option": "RECORD_LIMIT",
+          "label": "记录限制",
+          "meaning": "接受记录，但把时间、来源、字段或使用范围限制写入审核记录。",
+          "permits": "允许在限制条件内保留或重跑相关分析。",
+          "prohibits": "不允许把受限观察当成完整事实或确定性结论。"
+        },
+        {
+          "option": "REJECT",
+          "label": "驳回",
+          "meaning": "拒绝该到达项进入当前企业证据快照。",
+          "permits": "保留拒绝原因和到达痕迹，继续使用原快照。",
+          "prohibits": "不允许用被驳回材料改变候选、审核或验证状态。"
+        }
+      ],
+      "audit_record_preview": {
+        "record_class": "DEMO_REVIEW_RECORD",
+        "case_id": "RCA-EXT-004",
+        "baseline_snapshot_id": "PUB-RCA-EXT-004-SNAPSHOT-V1",
+        "arrival_disposition": "CONFLICT_PENDING",
+        "checklist_result": "CONFLICT_PENDING",
+        "safety_path": "REVIEW_REQUIRED",
+        "quality_path": "CONFLICT_SET_CREATED",
+        "invalidated_artifacts": [
+          "CandidateSet",
+          "DiagnosisReview",
+          "ValidationReadiness"
+        ],
+        "rerun_from_gate": "G2",
+        "next_action": "审核冲突集和受影响范围，决定暂停或升级，不选择“哪一方更像真相”。",
+        "human_decision": null,
+        "reviewer_identity": null,
+        "signature": null,
+        "enterprise_approval_fact": false,
+        "record_boundary": "这是演示审核记录预览，不是真实企业审批记录；不生成审核人、签名或批准事实。"
+      }
+    },
+    {
+      "scenario_id": "DUPLICATE_RECORD",
+      "title": "重复到达的同一记录",
+      "subtitle": "来源记录 ID 和内容哈希均与当前证据一致",
+      "demo_input": true,
+      "case_id": "RCA-EXT-001",
+      "case_title": "ACC-跟停前车静止车，车速65，刹车晚，有恐慌感",
+      "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+      "change_type": "ADDITIVE_EVIDENCE",
+      "arrival_disposition": "DUPLICATE_NOOP",
+      "current_gate": "G2",
+      "rerun_scope": "NONE",
+      "source_gate": {
+        "state": "DUPLICATE_NOOP",
+        "detail": "同一来源记录和内容哈希已存在，按幂等规则记录到达。"
+      },
+      "safety_path": {
+        "state": "NORMAL",
+        "detail": "没有新增风险信号。"
+      },
+      "quality_path": {
+        "state": "DUPLICATE_NOOP",
+        "detail": "不创建新证据版本，不重复通知，不重跑分析。"
+      },
+      "time_basis": {
+        "event_time": "与当前记录一致",
+        "received_at": "演示接收时间",
+        "watermark_relation": "ON_TIME"
+      },
+      "version_effect": {
+        "old_snapshot_id": "PUB-CASE-SNAPSHOT-V1",
+        "old_snapshot_preserved": true,
+        "new_snapshot_becomes_current": false,
+        "old_review_preserved": true,
+        "current_snapshot_state": "PUB-CASE-SNAPSHOT-V1"
+      },
+      "invalidated_objects": [],
+      "decision_applicability": "CURRENT",
+      "review_reopen_status": "NOT_REQUIRED",
+      "conflict_resolution": "NOT_APPLICABLE",
+      "human_review": {
+        "required": false,
+        "phase": "none",
+        "decision_options": [],
+        "question": "不需要人工批准：这是已知证据的重复到达。",
+        "approved_action": "保留幂等到达记录，继续使用当前快照。",
+        "reviewer_count_policy": "ENTERPRISE_DEFINED"
+      },
+      "next_action": {
+        "owner": "系统记录",
+        "action": "记录重复到达，不改变当前证据和审核状态。"
+      },
+      "root_cause_claim_allowed": false,
+      "ota_causality_claim_allowed": false,
+      "forbidden_claims": [
+        "不得确认根因",
+        "不得确认 OTA 因果",
+        "不得自动发布",
+        "不得自动回滚",
+        "不得自动关闭 Case"
+      ],
+      "review_checklist": [
+        {
+          "check_id": "SOURCE_AUTHORIZATION",
+          "label": "企业来源授权",
+          "purpose": "确认材料来自企业授权数据源，而不是公开、演示或未知来源。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CASE_BINDING",
+          "label": "Case 归属",
+          "purpose": "确认记录能绑定到一个已存在的企业 Case，不能凭相似描述归并。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SOURCE_RECORD_ID",
+          "label": "来源记录 ID",
+          "purpose": "确认原始系统记录有稳定 ID，后续可以定位同一条记录。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONTENT_HASH",
+          "label": "内容哈希",
+          "purpose": "确认内容哈希可复算，用于发现篡改和重复到达。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "TIME_SEMANTICS",
+          "label": "事件时间与接收时间",
+          "purpose": "分开记录事件发生时间、平台接收时间和冻结窗口关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SCHEMA_PARSER",
+          "label": "Schema 与解析版本",
+          "purpose": "确认字段按照已知 Schema 和解析版本解释，避免版本差异被当成事实变化。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONFLICT_AND_SAFETY",
+          "label": "冲突与安全信号",
+          "purpose": "检查同一事实是否冲突，以及是否触发现有安全责任流程。",
+          "status": "PASS",
+          "detail": "未发现需要改变当前路径的来源冲突；安全信号按现有规则单独处理。"
+        },
+        {
+          "check_id": "CURRENT_SNAPSHOT",
+          "label": "当前快照身份",
+          "purpose": "确认追加对象、旧快照和旧审核之间的版本关系。",
+          "status": "PASS",
+          "detail": "记录已与当前快照中的来源 ID 和哈希匹配，按幂等规则不创建新版本。"
+        }
+      ],
+      "artifact_impact": {
+        "rerun_from_gate": "NONE",
+        "scope_reason": "没有新事实进入当前证据链，因此不需要重跑。",
+        "items": [
+          {
+            "artifact_id": "SOURCE_AUDIT",
+            "label": "来源审计",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "EVIDENCE_SNAPSHOT",
+            "label": "证据快照",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "CANDIDATE_SET",
+            "label": "候选集",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "DIAGNOSIS_REVIEW",
+            "label": "诊断审核",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "SAFETY_REVIEW_APPLICABILITY",
+            "label": "安全审核适用性",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "VALIDATION_READINESS",
+            "label": "验证准入状态",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          }
+        ]
+      },
+      "decision_semantics": [],
+      "audit_record_preview": {
+        "record_class": "DEMO_REVIEW_RECORD",
+        "case_id": "RCA-EXT-001",
+        "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+        "arrival_disposition": "DUPLICATE_NOOP",
+        "checklist_result": "DUPLICATE_NOOP",
+        "safety_path": "NORMAL",
+        "quality_path": "DUPLICATE_NOOP",
+        "invalidated_artifacts": [],
+        "rerun_from_gate": "NONE",
+        "next_action": "记录重复到达，不改变当前证据和审核状态。",
+        "human_decision": null,
+        "reviewer_identity": null,
+        "signature": null,
+        "enterprise_approval_fact": false,
+        "record_boundary": "这是演示审核记录预览，不是真实企业审批记录；不生成审核人、签名或批准事实。"
+      }
+    },
+    {
+      "scenario_id": "NON_ENTERPRISE_INPUT",
+      "title": "公开或演示来源的新材料",
+      "subtitle": "不属于当前企业授权的真实数据包",
+      "demo_input": true,
+      "case_id": "RCA-EXT-001",
+      "case_title": "ACC-跟停前车静止车，车速65，刹车晚，有恐慌感",
+      "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+      "change_type": "HISTORICAL_REFERENCE",
+      "arrival_disposition": "EXCLUDED_NON_ENTERPRISE",
+      "current_gate": "G2",
+      "rerun_scope": "NONE",
+      "source_gate": {
+        "state": "EXCLUDED_NON_ENTERPRISE",
+        "detail": "来源不属于企业授权数据，不能进入当前证据快照。"
+      },
+      "safety_path": {
+        "state": "NORMAL",
+        "detail": "演示输入不触发现实安全决策。"
+      },
+      "quality_path": {
+        "state": "EXCLUDED_NON_ENTERPRISE",
+        "detail": "记录排除原因，不创建 Evidence ID，不影响当前 Case。"
+      },
+      "time_basis": {
+        "event_time": "不适用于企业 Case",
+        "received_at": "演示接收时间",
+        "watermark_relation": "UNKNOWN"
+      },
+      "version_effect": {
+        "old_snapshot_id": "PUB-CASE-SNAPSHOT-V1",
+        "old_snapshot_preserved": true,
+        "new_snapshot_becomes_current": false,
+        "old_review_preserved": true,
+        "current_snapshot_state": "PUB-CASE-SNAPSHOT-V1"
+      },
+      "invalidated_objects": [],
+      "decision_applicability": "CURRENT",
+      "review_reopen_status": "NOT_REQUIRED",
+      "conflict_resolution": "NOT_APPLICABLE",
+      "human_review": {
+        "required": false,
+        "phase": "none",
+        "decision_options": [],
+        "question": "不需要人工批准：该材料无权进入企业当前证据链。",
+        "approved_action": "保留排除记录，继续使用当前企业快照。",
+        "reviewer_count_policy": "ENTERPRISE_DEFINED"
+      },
+      "next_action": {
+        "owner": "系统记录",
+        "action": "登记为非企业输入，不向企业证据链传播。"
+      },
+      "root_cause_claim_allowed": false,
+      "ota_causality_claim_allowed": false,
+      "forbidden_claims": [
+        "不得确认根因",
+        "不得确认 OTA 因果",
+        "不得自动发布",
+        "不得自动回滚",
+        "不得自动关闭 Case"
+      ],
+      "review_checklist": [
+        {
+          "check_id": "SOURCE_AUTHORIZATION",
+          "label": "企业来源授权",
+          "purpose": "确认材料来自企业授权数据源，而不是公开、演示或未知来源。",
+          "status": "FAIL",
+          "detail": "来源不属于企业授权数据，不能进入当前证据快照。"
+        },
+        {
+          "check_id": "CASE_BINDING",
+          "label": "Case 归属",
+          "purpose": "确认记录能绑定到一个已存在的企业 Case，不能凭相似描述归并。",
+          "status": "NOT_APPLICABLE",
+          "detail": "未通过企业来源门禁，不建立当前 Case 绑定或快照关系。"
+        },
+        {
+          "check_id": "SOURCE_RECORD_ID",
+          "label": "来源记录 ID",
+          "purpose": "确认原始系统记录有稳定 ID，后续可以定位同一条记录。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONTENT_HASH",
+          "label": "内容哈希",
+          "purpose": "确认内容哈希可复算，用于发现篡改和重复到达。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "TIME_SEMANTICS",
+          "label": "事件时间与接收时间",
+          "purpose": "分开记录事件发生时间、平台接收时间和冻结窗口关系。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "SCHEMA_PARSER",
+          "label": "Schema 与解析版本",
+          "purpose": "确认字段按照已知 Schema 和解析版本解释，避免版本差异被当成事实变化。",
+          "status": "PASS",
+          "detail": "该项可由到达记录和当前企业快照核对。"
+        },
+        {
+          "check_id": "CONFLICT_AND_SAFETY",
+          "label": "冲突与安全信号",
+          "purpose": "检查同一事实是否冲突，以及是否触发现有安全责任流程。",
+          "status": "PASS",
+          "detail": "未发现需要改变当前路径的来源冲突；安全信号按现有规则单独处理。"
+        },
+        {
+          "check_id": "CURRENT_SNAPSHOT",
+          "label": "当前快照身份",
+          "purpose": "确认追加对象、旧快照和旧审核之间的版本关系。",
+          "status": "NOT_APPLICABLE",
+          "detail": "未通过企业来源门禁，不建立当前 Case 绑定或快照关系。"
+        }
+      ],
+      "artifact_impact": {
+        "rerun_from_gate": "NONE",
+        "scope_reason": "没有新事实进入当前证据链，因此不需要重跑。",
+        "items": [
+          {
+            "artifact_id": "SOURCE_AUDIT",
+            "label": "来源审计",
+            "status": "EXCLUDED",
+            "reason": "到达项被来源门禁排除，不进入该工件。"
+          },
+          {
+            "artifact_id": "EVIDENCE_SNAPSHOT",
+            "label": "证据快照",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "CANDIDATE_SET",
+            "label": "候选集",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "DIAGNOSIS_REVIEW",
+            "label": "诊断审核",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "SAFETY_REVIEW_APPLICABILITY",
+            "label": "安全审核适用性",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          },
+          {
+            "artifact_id": "VALIDATION_READINESS",
+            "label": "验证准入状态",
+            "status": "VALID",
+            "reason": "未依赖本次到达项，继续保留。"
+          }
+        ]
+      },
+      "decision_semantics": [],
+      "audit_record_preview": {
+        "record_class": "DEMO_REVIEW_RECORD",
+        "case_id": "RCA-EXT-001",
+        "baseline_snapshot_id": "PUB-RCA-EXT-001-SNAPSHOT-V1",
+        "arrival_disposition": "EXCLUDED_NON_ENTERPRISE",
+        "checklist_result": "EXCLUDED_NON_ENTERPRISE",
+        "safety_path": "NORMAL",
+        "quality_path": "EXCLUDED_NON_ENTERPRISE",
+        "invalidated_artifacts": [],
+        "rerun_from_gate": "NONE",
+        "next_action": "登记为非企业输入，不向企业证据链传播。",
+        "human_decision": null,
+        "reviewer_identity": null,
+        "signature": null,
+        "enterprise_approval_fact": false,
+        "record_boundary": "这是演示审核记录预览，不是真实企业审批记录；不生成审核人、签名或批准事实。"
+      }
+    }
+  ],
+  "boundaries": {
+    "root_cause_claim_allowed": false,
+    "ota_causality_claim_allowed": false,
+    "automatic_release_allowed": false,
+    "automatic_rollback_allowed": false,
+    "automatic_closure_allowed": false,
+    "demo_arrival_may_modify_enterprise_baseline": false
+  },
+  "publication_scope": "PUBLIC_DEMO_ONLY"
+}
