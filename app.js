@@ -54,8 +54,45 @@
     ]);
   }
 
+  function CloseoutRows({ items, metric = false }) {
+    const fallbackLabels = ['问题边界', '证据边界', '候选与门禁', '下一步动作'];
+    return h('div', { className: `closeout-rows ${metric ? 'coverage-metrics' : ''}` },
+      items.map((item, index) => h('div', { className: 'closeout-row', key: item.label }, [
+        h('p', { className: 'closeout-row-label', key: 'label' }, item.label || fallbackLabels[index]),
+        h('p', { className: 'closeout-row-value', key: 'value' }, item.value)
+      ]))
+    );
+  }
+
+  function DemoCloseout({ deliverable, coverage }) {
+    return h('section', { className: 'demo-closeout', 'aria-labelledby': 'closeout-title' }, [
+      h('div', { className: 'closeout-grid', key: 'grid' }, [
+        h('section', { className: 'closeout-column', key: 'deliverable' }, [
+          h('h2', { id: 'closeout-title', key: 'title' }, deliverable.title || '企业最终得到什么'),
+          h(CloseoutRows, { items: deliverable.items, key: 'items' }),
+          h('div', { className: 'closeout-boundary', key: 'boundary' }, [
+            h('p', { className: 'closeout-boundary-label', key: 'label' }, '交付边界'),
+            h('p', { key: 'value' }, deliverable.boundary)
+          ])
+        ]),
+        h('section', { className: 'closeout-column', 'aria-labelledby': 'coverage-title', key: 'coverage' }, [
+          h('h2', { id: 'coverage-title', key: 'title' }, '真实案例覆盖摘要'),
+          h(CloseoutRows, { items: coverage.metrics, metric: true, key: 'metrics' }),
+          h('ul', { className: 'closeout-rules', key: 'rules' }, [
+            h('li', { key: 'candidate' }, '受限候选 → 企业人工审核'),
+            h('li', { key: 'stop' }, '终止性停答 → 人工复核边界')
+          ]),
+          h('div', { className: 'closeout-boundary', key: 'boundary' }, [
+            h('p', { className: 'closeout-boundary-label', key: 'label' }, '覆盖边界'),
+            h('p', { key: 'value' }, coverage.boundary)
+          ])
+        ])
+      ])
+    ]);
+  }
+
   function App() {
-    const model = window.AutoGuardPresentation.buildFlowModel(window.AutoGuardRealRcaData);
+    const model = window.AutoGuardPublicDemoModel;
     const [activeStageId, setActiveStageId] = useState('G1');
     const pendingFocusStageId = useRef(null);
     const activeIndex = model.stages.findIndex((stage) => stage.id === activeStageId);
@@ -93,7 +130,7 @@
       ]),
       h('main', { key: 'main' }, [
         h('section', { className: 'case-opening', 'aria-labelledby': 'case-title', key: 'opening' }, [
-          h('p', { className: 'case-id', key: 'id' }, `${model.opening.dataLabel} / ${model.caseId}`),
+          h('p', { className: 'case-id', key: 'id' }, model.opening.dataLabel),
           h('h1', { id: 'case-title', key: 'title' }, model.opening.problem),
           h('p', { className: 'case-goal', key: 'goal' }, model.opening.goal),
           h('p', { className: 'case-status', key: 'status' }, model.opening.status)
@@ -126,7 +163,12 @@
             onClick: () => selectIndex(activeIndex + 1),
             key: 'continue'
           }, '继续')
-        ])
+        ]),
+        h(DemoCloseout, {
+          deliverable: model.deliverable,
+          coverage: model.coverage,
+          key: 'closeout'
+        })
       ])
     ]);
   }
