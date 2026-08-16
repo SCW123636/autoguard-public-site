@@ -5,52 +5,50 @@
     return { completed: '已完成', current: '待审核', locked: '未解锁' }[state] || '待处理';
   }
 
-  function MethodBlock({ label, value, tone = '' }) {
-    return h('section', { className: `method-block ${tone}` }, [
-      h('p', { className: 'method-block-label', key: 'label' }, label),
-      h('p', { className: 'method-block-value', key: 'value' }, value)
+  function StageHeading({ stage }) {
+    return h('header', { className: 'stage-heading' }, [
+      h('p', { className: 'stage-code', key: 'code' }, stage.code),
+      h('div', { key: 'copy' }, [
+        h('h2', { key: 'title' }, stage.title),
+        h('p', { key: 'summary' }, stage.purpose)
+      ]),
+      h('span', { className: `stage-state ${stage.state}`, key: 'state' }, stateLabel(stage.state))
     ]);
   }
 
-  function EvidenceComparison({ comparison }) {
-    return h('div', { className: 'evidence-comparison' },
-      ['support', 'counter', 'missing'].map((key) => {
-        const group = comparison[key];
-        return h('section', { className: `evidence-group ${key}`, key }, [
-          h('h3', { key: 'title' }, group.title),
-          h('ul', { key: 'items' }, group.items.map((item) => h('li', { key: item }, item)))
-        ]);
-      })
-    );
+  function StageOutputStrip({ stage }) {
+    return h('section', { className: 'stage-output-strip', 'aria-label': '阶段输出' }, [
+      h('div', { key: 'output' }, [
+        h('span', { key: 'label' }, '本阶段输出'),
+        h('strong', { key: 'value' }, stage.output)
+      ]),
+      h('div', { key: 'boundary' }, [
+        h('span', { key: 'label' }, '输出边界'),
+        h('p', { key: 'value' }, stage.boundary)
+      ]),
+      h('div', { key: 'next' }, [
+        h('span', { key: 'label' }, '下一步动作'),
+        h('p', { key: 'value' }, stage.nextAction)
+      ])
+    ]);
   }
 
-  function StagePanel({ stage }) {
+  function StagePanel({ stage, isActive }) {
     return h('article', {
-      className: `stage-workspace ${stage.state}`,
+      className: `stage-workspace stage-${stage.id.toLowerCase()} ${stage.state}`,
       id: `stage-panel-${stage.id}`,
       role: "tabpanel",
-      'aria-labelledby': `stage-tab-${stage.id}`
+      'aria-labelledby': `stage-tab-${stage.id}`,
+      hidden: !isActive,
+      'aria-hidden': !isActive
     }, [
-      h('header', { className: 'stage-heading', key: 'heading' }, [
-        h('p', { className: 'stage-code', key: 'code' }, stage.code),
-        h('div', { key: 'copy' }, [
-          h('h2', { key: 'title' }, stage.title),
-          h('p', { key: 'summary' }, stage.purpose)
-        ]),
-        h('span', { className: `stage-state ${stage.state}`, key: 'state' }, stateLabel(stage.state))
+      h(StageHeading, { stage, key: 'heading' }),
+      h('div', { className: 'stage-question', key: 'question' }, [
+        h('span', { key: 'label' }, '本阶段回答'),
+        h('strong', { key: 'value' }, stage.question)
       ]),
-      h('div', { className: 'method-grid', key: 'grid' }, [
-        h(MethodBlock, { label: '本步要解决', value: stage.purpose, key: 'purpose' }),
-        h(MethodBlock, { label: 'AutoGuard 怎么处理', value: stage.method, tone: 'method', key: 'method' }),
-        h('section', { className: 'method-block finding', key: 'finding' }, [
-          h('p', { className: 'method-block-label', key: 'label' }, '真实案例发现'),
-          h('p', { className: 'method-block-value', key: 'value' }, stage.finding),
-          stage.evidenceComparison
-            ? h(EvidenceComparison, { comparison: stage.evidenceComparison, key: 'comparison' })
-            : null
-        ]),
-        h(MethodBlock, { label: '下一步门禁', value: stage.gate, tone: 'gate', key: 'gate' })
-      ])
+      window.AutoGuardStageViews.renderStageView(h, stage),
+      h(StageOutputStrip, { stage, key: 'output' })
     ]);
   }
 
@@ -76,7 +74,7 @@
           ])
         ]),
         h('section', { className: 'closeout-column', 'aria-labelledby': 'coverage-title', key: 'coverage' }, [
-          h('h2', { id: 'coverage-title', key: 'title' }, '真实案例覆盖摘要'),
+          h('h2', { id: 'coverage-title', key: 'title' }, coverage.title || '规则覆盖情况'),
           h(CloseoutRows, { items: coverage.metrics, metric: true, key: 'metrics' }),
           h('ul', { className: 'closeout-rules', key: 'rules' }, [
             h('li', { key: 'candidate' }, '受限候选 → 企业人工审核'),
@@ -93,10 +91,9 @@
 
   function App() {
     const model = window.AutoGuardPublicDemoModel;
-    const [activeStageId, setActiveStageId] = useState('G1');
+    const [activeStageId, setActiveStageId] = useState(model.currentStageId);
     const pendingFocusStageId = useRef(null);
     const activeIndex = model.stages.findIndex((stage) => stage.id === activeStageId);
-    const activeStage = model.stages[activeIndex];
 
     function selectIndex(nextIndex, moveFocus = false) {
       const boundedIndex = Math.max(0, Math.min(model.stages.length - 1, nextIndex));
@@ -111,14 +108,17 @@
       pendingFocusStageId.current = null;
     }, [activeStageId]);
 
-    useEffect(() => {
-      function onKeyDown(event) {
-        if (event.key === 'ArrowLeft') selectIndex(activeIndex - 1, true);
-        if (event.key === 'ArrowRight') selectIndex(activeIndex + 1, true);
+    function onStageKeyDown(event) {
+      if (event.target?.getAttribute?.('role') !== 'tab') return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        selectIndex(activeIndex - 1, true);
       }
-      window.addEventListener('keydown', onKeyDown);
-      return () => window.removeEventListener('keydown', onKeyDown);
-    }, [activeIndex]);
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        selectIndex(activeIndex + 1, true);
+      }
+    }
 
     return h('div', { className: 'single-case-flow' }, [
       h('header', { className: 'site-header', key: 'header' }, [
@@ -136,7 +136,7 @@
           h('p', { className: 'case-status', key: 'status' }, model.opening.status)
         ]),
         h('nav', { className: 'stage-rail', 'aria-label': '完整归因链阶段', key: 'rail' }, [
-          h('div', { role: "tablist", 'aria-label': '归因链阶段', key: 'tabs' }, model.stages.map((stage) => h('button', {
+          h('div', { role: "tablist", 'aria-label': '归因链阶段', onKeyDown: onStageKeyDown, key: 'tabs' }, model.stages.map((stage) => h('button', {
             id: `stage-tab-${stage.id}`,
             type: 'button',
             role: 'tab',
@@ -148,19 +148,23 @@
             onClick: () => setActiveStageId(stage.id)
           }, `${stage.code} ${stage.shortTitle}`)))
         ]),
-        h(StagePanel, { stage: activeStage, key: activeStage.id }),
+        model.stages.map((stage) => h(StagePanel, {
+          stage,
+          isActive: stage.id === activeStageId,
+          key: stage.id
+        })),
         h('nav', { className: 'stage-navigation', 'aria-label': '阶段翻页', key: 'navigation' }, [
           h('button', {
             type: 'button',
             disabled: activeIndex === 0,
-            onClick: () => selectIndex(activeIndex - 1),
+            onClick: () => selectIndex(activeIndex - 1, true),
             key: 'previous'
           }, '上一步'),
           h('span', { key: 'position' }, `${activeIndex + 1} / ${model.stages.length}`),
           h('button', {
             type: 'button',
             disabled: activeIndex === model.stages.length - 1,
-            onClick: () => selectIndex(activeIndex + 1),
+            onClick: () => selectIndex(activeIndex + 1, true),
             key: 'continue'
           }, '继续')
         ]),
@@ -173,5 +177,14 @@
     ]);
   }
 
-  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+  const model = window.AutoGuardPublicDemoModel;
+  const stageViews = window.AutoGuardStageViews;
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+
+  if (!model || !Array.isArray(model.stages) || !model.stages.some((stage) => stage.id === model.currentStageId)
+    || !stageViews || typeof stageViews.renderStageView !== 'function') {
+    root.render(h('main', { role: 'alert' }, '公开展示数据未加载'));
+  } else {
+    root.render(h(App));
+  }
 })();
