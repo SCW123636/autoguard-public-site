@@ -48,6 +48,16 @@ test('presentation adapter keeps G2 and G3 findings case-specific', () => {
   assert.notEqual(candidateModel.stages[2].finding, tensionModel.stages[2].finding);
 });
 
+test('presentation adapter uses computed G3 gate text for terminal cases without hypotheses', () => {
+  const caseItem = workbench.cases.find((item) => item.case_id === 'RCA-EXT-003');
+  const runResult = engine.runCase(caseItem);
+  const model = presentation.buildCaseFlow(caseItem, runResult);
+
+  assert.equal(runResult.decision.code, 'TERMINAL_STOP');
+  assert.equal(model.stages[2].gate, runResult.decision.nextAction);
+  assert.notEqual(model.stages[2].gate, caseItem.enterprise.next_action);
+});
+
 test('presentation adapter renders missing future-stage data and missing next action without cross-case leakage', () => {
   const source = workbench.cases.find((caseItem) => caseItem.case_id === 'RCA-EXT-005');
   const caseItem = clone(source);

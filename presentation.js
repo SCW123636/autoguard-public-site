@@ -106,7 +106,7 @@
     if (!hypotheses || hypotheses.length === 0) {
       return {
         finding: text(runResult.decision?.summary, MISSING_TEXT),
-        gate: currentData(caseItem.enterprise?.next_action),
+        gate: text(runResult.decision?.nextAction, MISSING_TEXT),
         evidenceComparison: {
           support: MISSING_TEXT,
           counter: MISSING_TEXT,
