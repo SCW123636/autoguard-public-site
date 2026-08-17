@@ -7,11 +7,22 @@ const test = require('node:test');
 
 const root = path.join(__dirname, '..');
 
-test('GitHub Pages entry loads the executable real-case demo before the app', () => {
+test('GitHub Pages entry loads the single-case runtime in deterministic order', () => {
   const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [
+    './data/real-rca-cases.js?v=single-case-v1',
+    './demo-engine.js?v=single-case-v1',
+    './presentation.js?v=single-case-v1',
+    './app.js?v=single-case-v1'
+  ];
 
-  assert.ok(index.indexOf('./demo-engine.js') < index.indexOf('./app.js'));
-  assert.match(index, /real-rca-cases\.js/);
+  for (const script of scripts) assert.match(index, new RegExp(script.replace(/[./?=-]/g, '\\$&')));
+  assert.deepEqual(
+    [...index.matchAll(/<script src="(\.\/[^\"]+)"/g)]
+      .map((match) => match[1])
+      .filter((source) => source.includes('real-rca-cases') || source.includes('demo-engine') || source.includes('presentation') || source.includes('app.js')),
+    scripts
+  );
   assert.doesNotMatch(index, /stage-views\.js/);
 });
 
@@ -95,10 +106,20 @@ test('published demo engine includes decision summaries for rejected input', () 
   assert.equal(rejected.decision.summary.length > 0, true);
 });
 
-test('published app includes the live input and run controls', () => {
+test('published app exposes only the dynamic single-case flow', () => {
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 
-  assert.match(app, /LiveAnalysisDemo/);
-  assert.match(app, /AutoGuardDemoEngine/);
-  assert.match(app, /live-run-button/);
+  for (const marker of [
+    'DynamicCaseSelector',
+    'SingleCaseFlow',
+    'StagePanel',
+    'stage-rail',
+    'stage-navigation',
+    'DemoCloseout',
+    'buildCaseFlow'
+  ]) {
+    assert.match(app, new RegExp(marker), marker);
+  }
+  assert.doesNotMatch(app, /LiveAnalysisDemo/);
+  assert.doesNotMatch(app, /live-method-line/);
 });
