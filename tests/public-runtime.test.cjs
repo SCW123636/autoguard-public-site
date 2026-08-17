@@ -232,6 +232,26 @@ test('published app exposes only the dynamic single-case flow', () => {
   assert.doesNotMatch(app, /live-method-line/);
 });
 
+test('published stylesheet supports the focused single-case hierarchy', () => {
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+
+  for (const selector of [
+    '.case-selector',
+    '.single-case-flow',
+    '.case-opening',
+    '.stage-rail',
+    '.stage-panel',
+    '.evidence-comparison',
+    '.stage-navigation',
+    '.demo-closeout'
+  ]) {
+    assert.match(styles, new RegExp('\\' + selector + '(?:[\\s,{:#.]|$)'), selector);
+  }
+
+  assert.match(styles, /@media\s*\(max-width:\s*720px\)/);
+  assert.doesNotMatch(styles, /\.live-analysis-demo\b/);
+});
+
 test('published G1 keeps the enterprise report separate from the pre-verification finding', () => {
   const model = caseFlowModel();
   const rendered = renderPublishedApp(model);
