@@ -84,6 +84,7 @@
       const decision = {
         code: 'INPUT_REJECTED',
         label: DECISION_LABELS.INPUT_REJECTED,
+        summary: inputCheck.reason,
         candidates: [],
         rootCauseClaimAllowed: false,
         otaCausalityClaimAllowed: false,
@@ -141,6 +142,7 @@
         decision: {
           code: 'EVIDENCE_REFERENCE_BLOCKED',
           label: DECISION_LABELS.EVIDENCE_REFERENCE_BLOCKED,
+          summary: `发现 ${invalidEvidenceIds.length} 个快照外 Evidence ID，本次分析不继续。`,
           candidates: [],
           rootCauseClaimAllowed: false,
           otaCausalityClaimAllowed: false,

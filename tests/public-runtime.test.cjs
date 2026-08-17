@@ -15,14 +15,59 @@ test('GitHub Pages entry loads the executable real-case demo before the app', ()
   assert.doesNotMatch(index, /stage-views\.js/);
 });
 
-test('published demo engine routes real cases through the same three gates', () => {
+test('published demo engine locks evidence-gate decisions for all ten real cases', () => {
   const engine = require(path.join(root, 'demo-engine.js'));
   const workbench = require(path.join(root, 'data', 'real-rca-cases.js'));
-  const run = (caseId) => engine.runCase(workbench.cases.find((item) => item.case_id === caseId));
+  const expected = {
+    'RCA-EXT-001': 'LIMITED_CANDIDATES_READY',
+    'RCA-EXT-002': 'LIMITED_CANDIDATES_READY',
+    'RCA-EXT-003': 'TERMINAL_STOP',
+    'RCA-EXT-004': 'EVIDENCE_TENSION_AND_STOP',
+    'RCA-EXT-005': 'LIMITED_CANDIDATES_READY',
+    'RCA-EXT-006': 'LIMITED_CANDIDATES_READY',
+    'RCA-EXT-007': 'TERMINAL_STOP',
+    'RCA-EXT-008': 'SAFETY_PRIORITY_REVIEW_AND_STOP',
+    'RCA-EXT-009': 'TERMINAL_STOP',
+    'RCA-EXT-010': 'EVIDENCE_TENSION_AND_STOP'
+  };
 
-  assert.equal(run('RCA-EXT-005').decision.code, 'LIMITED_CANDIDATES_READY');
-  assert.equal(run('RCA-EXT-004').decision.code, 'EVIDENCE_TENSION_AND_STOP');
-  assert.equal(run('RCA-EXT-008').decision.code, 'SAFETY_PRIORITY_REVIEW_AND_STOP');
+  assert.deepEqual(workbench.cases.map((item) => item.case_id), Object.keys(expected));
+
+  for (const caseItem of workbench.cases) {
+    const result = engine.runCase(caseItem);
+    assert.equal(result.decision.code, expected[caseItem.case_id], caseItem.case_id);
+    assert.equal(result.decision.rootCauseClaimAllowed, false, caseItem.case_id);
+    assert.equal(result.decision.otaCausalityClaimAllowed, false, caseItem.case_id);
+    assert.equal(result.audit.snapshotBound, true, caseItem.case_id);
+    assert.equal(result.audit.allEvidenceReferencesValid, true, caseItem.case_id);
+    assert.equal(typeof result.decision.summary, 'string', caseItem.case_id);
+    assert.deepEqual(engine.runCase(caseItem), result, caseItem.case_id);
+  }
+});
+
+test('published demo engine derives the decision from evidence and not case ID', () => {
+  const engine = require(path.join(root, 'demo-engine.js'));
+  const workbench = require(path.join(root, 'data', 'real-rca-cases.js'));
+  const source = workbench.cases.find((item) => item.case_id === 'RCA-EXT-005');
+
+  const withoutHypotheses = JSON.parse(JSON.stringify(source));
+  withoutHypotheses.engineering.hypotheses = [];
+  assert.equal(engine.runCase(withoutHypotheses).decision.code, 'TERMINAL_STOP');
+
+  const withUnknownEvidence = JSON.parse(JSON.stringify(source));
+  withUnknownEvidence.engineering.hypotheses[0].support_evidence_ids.push('EV-UNKNOWN-SUPPORT');
+  const blocked = engine.runCase(withUnknownEvidence);
+  assert.equal(blocked.decision.code, 'EVIDENCE_REFERENCE_BLOCKED');
+  assert.equal(blocked.decision.summary.length > 0, true);
+  assert.deepEqual(blocked.audit.invalidEvidenceIds, ['EV-UNKNOWN-SUPPORT']);
+});
+
+test('published demo engine includes decision summaries for rejected input', () => {
+  const engine = require(path.join(root, 'demo-engine.js'));
+
+  const rejected = engine.runCase(null);
+  assert.equal(rejected.decision.code, 'INPUT_REJECTED');
+  assert.equal(rejected.decision.summary.length > 0, true);
 });
 
 test('published app includes the live input and run controls', () => {
