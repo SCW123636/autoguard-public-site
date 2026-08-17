@@ -3675,8 +3675,16 @@ p {
 }
 
 .case-opening-status strong {
-  color: var(--green);
-  font-size: 13px;
+  width: fit-content;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  background: var(--surface-soft);
+  color: var(--text-soft);
+  font-size: 12px;
 }
 
 .case-opening-status .mono {

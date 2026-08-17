@@ -252,6 +252,16 @@ test('published stylesheet supports the focused single-case hierarchy', () => {
   assert.doesNotMatch(styles, /\.live-analysis-demo\b/);
 });
 
+test('published decision status uses neutral shared styling', () => {
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  const statusRule = styles.match(/\.case-opening-status strong\s*\{([^}]*)\}/);
+
+  assert.ok(statusRule, 'case opening decision status rule');
+  assert.match(statusRule[1], /color:\s*var\(--text-soft\)/);
+  assert.match(statusRule[1], /background:\s*var\(--surface-soft\)/);
+  assert.doesNotMatch(statusRule[1], /var\(--green\)|var\(--red\)|var\(--amber\)|var\(--orange\)/);
+});
+
 test('published G1 keeps the enterprise report separate from the pre-verification finding', () => {
   const model = caseFlowModel();
   const rendered = renderPublishedApp(model);
