@@ -62,6 +62,31 @@ test('published demo engine derives the decision from evidence and not case ID',
   assert.deepEqual(blocked.audit.invalidEvidenceIds, ['EV-UNKNOWN-SUPPORT']);
 });
 
+test('published demo engine preserves evidence-gate priority for overlapping conditions', () => {
+  const engine = require(path.join(root, 'demo-engine.js'));
+  const workbench = require(path.join(root, 'data', 'real-rca-cases.js'));
+  const source = workbench.cases.find((item) => item.case_id === 'RCA-EXT-005');
+  const clone = () => JSON.parse(JSON.stringify(source));
+
+  const invalidReferenceOverAll = clone();
+  invalidReferenceOverAll.safety_route = 'SAFETY_PRIORITY_REVIEW';
+  invalidReferenceOverAll.evidence_tension_state = 'EVIDENCE_TENSION';
+  invalidReferenceOverAll.engineering.hypotheses[0].support_evidence_ids.push('EV-UNKNOWN-PRIORITY');
+  assert.equal(engine.runCase(invalidReferenceOverAll).decision.code, 'EVIDENCE_REFERENCE_BLOCKED');
+
+  const safetyOverTensionAndCandidate = clone();
+  safetyOverTensionAndCandidate.safety_route = 'SAFETY_PRIORITY_REVIEW';
+  safetyOverTensionAndCandidate.evidence_tension_state = 'EVIDENCE_TENSION';
+  assert.equal(engine.runCase(safetyOverTensionAndCandidate).decision.code, 'SAFETY_PRIORITY_REVIEW_AND_STOP');
+
+  const tensionOverCandidate = clone();
+  tensionOverCandidate.evidence_tension_state = 'EVIDENCE_TENSION';
+  assert.equal(engine.runCase(tensionOverCandidate).decision.code, 'EVIDENCE_TENSION_AND_STOP');
+
+  const candidateOverTerminal = clone();
+  assert.equal(engine.runCase(candidateOverTerminal).decision.code, 'LIMITED_CANDIDATES_READY');
+});
+
 test('published demo engine includes decision summaries for rejected input', () => {
   const engine = require(path.join(root, 'demo-engine.js'));
 
