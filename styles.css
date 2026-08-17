@@ -3530,6 +3530,10 @@ p {
   flex-basis: 32px;
 }
 
+.focused-demo-header .brand-lockup {
+  border-bottom: 0;
+}
+
 .case-header-id {
   flex: 0 0 auto;
   color: var(--cyan);

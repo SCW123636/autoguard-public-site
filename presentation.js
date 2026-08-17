@@ -4,6 +4,7 @@
   if (root) root.AutoGuardPresentation = api;
 })(typeof window !== 'undefined' ? window : null, function createAutoGuardPresentation() {
   const MISSING_TEXT = '当前数据未提供';
+  const G1_GATE = '问题已结构化，可进入证据冻结；当前不确认根因。';
   const STORY_STEPS = Object.freeze([
     Object.freeze({ id: 'problem', label: '01 企业提出的问题' }),
     Object.freeze({ id: 'facts', label: '02 真实数据发现' }),
@@ -47,9 +48,55 @@
     return Array.isArray(value) ? value.length : 0;
   }
 
-  function countHypothesisEvidence(hypotheses, key) {
-    if (!Array.isArray(hypotheses) || hypotheses.length === 0) return 0;
-    return hypotheses.reduce((sum, item) => sum + countItems(item?.[key]), 0);
+  function uniqueStrings(values) {
+    if (!Array.isArray(values)) return [];
+    return [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))];
+  }
+
+  function observationsWithStatus(observations, status) {
+    if (!Array.isArray(observations)) return [];
+    return observations.filter((observation) => observation?.status === status);
+  }
+
+  function formatEvidenceIds(values, limit = 6) {
+    const evidenceIds = uniqueStrings(values);
+    if (evidenceIds.length === 0) return MISSING_TEXT;
+    const visibleIds = evidenceIds.slice(0, limit);
+    const suffix = evidenceIds.length > visibleIds.length ? ` 等 ${evidenceIds.length} 个 ID` : '';
+    return visibleIds.join('、') + suffix;
+  }
+
+  function summarizeObservationEvidence(observations, status, label, invalidEvidenceIds) {
+    const matching = observationsWithStatus(observations, status);
+    if (matching.length === 0) return MISSING_TEXT;
+    const invalidIds = new Set(uniqueStrings(invalidEvidenceIds));
+    const evidenceIds = uniqueStrings(matching.flatMap((observation) => observation?.evidence_ids || []))
+      .filter((evidenceId) => !invalidIds.has(evidenceId));
+    const evidenceText = evidenceIds.length > 0
+      ? formatEvidenceIds(evidenceIds)
+      : 'Evidence ID 引用已阻断';
+    return `${matching.length} 条派生观察（${label}：${evidenceText}）`;
+  }
+
+  function summarizeMissingEvidence(engineering, invalidEvidenceIds) {
+    const observations = Array.isArray(engineering.derived_observations)
+      ? engineering.derived_observations
+      : [];
+    const parts = [];
+    const missingObservations = observationsWithStatus(observations, 'missing_evidence');
+    if (missingObservations.length > 0) {
+      parts.push(summarizeObservationEvidence(
+        observations,
+        'missing_evidence',
+        '缺失',
+        invalidEvidenceIds
+      ));
+    }
+    const registeredMissingIds = uniqueStrings(engineering.missing_evidence_ids);
+    if (registeredMissingIds.length > 0) {
+      parts.push(`${registeredMissingIds.length} 个已登记缺失项（${formatEvidenceIds(registeredMissingIds)}）`);
+    }
+    return parts.join('；') || MISSING_TEXT;
   }
 
   function hasTraceableField(value) {
@@ -74,6 +121,7 @@
       title: currentData(caseItem.title),
       domain: currentData(caseItem.domain),
       problem: currentData(enterprise.problem),
+      goal: currentData(enterprise.goal),
       snapshotId: currentData(engineering.evidence_snapshot_id),
       decisionCode: currentData(runResult.decision?.code),
       decisionLabel: currentData(runResult.decision?.label),
@@ -81,15 +129,22 @@
     };
   }
 
-  function buildEvidenceSummary(caseItem = {}) {
+  function buildEvidenceSummary(caseItem = {}, runResult = {}) {
     const engineering = caseItem.engineering || {};
-    const hypotheses = Array.isArray(engineering.hypotheses) ? engineering.hypotheses : [];
+    const observations = Array.isArray(engineering.derived_observations)
+      ? engineering.derived_observations
+      : [];
+    const acceptedCandidates = runResult.decision?.code === 'LIMITED_CANDIDATES_READY' &&
+      Array.isArray(runResult.decision?.candidates)
+      ? runResult.decision.candidates
+      : [];
     return {
       evidenceCount: countItems(engineering.evidence_items),
-      observationCount: countItems(engineering.derived_observations),
-      candidateCount: hypotheses.length,
-      supportCount: countHypothesisEvidence(hypotheses, 'support_evidence_ids'),
-      counterCount: countHypothesisEvidence(hypotheses, 'counter_evidence_ids'),
+      observationCount: observations.length,
+      candidateCount: acceptedCandidates.length,
+      supportCount: observationsWithStatus(observations, 'supporting_observation').length,
+      counterCount: observationsWithStatus(observations, 'counter_evidence').length,
+      missingObservationCount: observationsWithStatus(observations, 'missing_evidence').length,
       missingCount: countItems(engineering.missing_evidence_ids),
       snapshotId: currentData(engineering.evidence_snapshot_id),
       evidenceIds: arrayText(
@@ -102,36 +157,40 @@
 
   function buildCandidateComparison(caseItem = {}, runResult = {}) {
     const engineering = caseItem.engineering || {};
-    const hypotheses = Array.isArray(engineering.hypotheses) ? engineering.hypotheses : null;
-    if (!hypotheses || hypotheses.length === 0) {
-      return {
-        finding: text(runResult.decision?.summary, MISSING_TEXT),
-        gate: text(runResult.decision?.nextAction, MISSING_TEXT),
-        evidenceComparison: {
-          support: MISSING_TEXT,
-          counter: MISSING_TEXT,
-          missing: MISSING_TEXT
-        }
-      };
-    }
-
-    const candidates = Array.isArray(runResult.decision?.candidates) ? runResult.decision.candidates : [];
-    const selected = candidates.length > 0 ? candidates : hypotheses;
+    const observations = Array.isArray(engineering.derived_observations)
+      ? engineering.derived_observations
+      : [];
+    const invalidEvidenceIds = Array.isArray(runResult.audit?.invalidEvidenceIds)
+      ? runResult.audit.invalidEvidenceIds
+      : [];
+    const candidates = runResult.decision?.code === 'LIMITED_CANDIDATES_READY' &&
+      Array.isArray(runResult.decision?.candidates)
+      ? runResult.decision.candidates
+      : [];
+    const candidateLabels = candidates
+      .map((candidate) => text(candidate.label, ''))
+      .filter(Boolean);
+    const supportObservations = summarizeObservationEvidence(
+      observations,
+      'supporting_observation',
+      '支持',
+      invalidEvidenceIds
+    );
+    const support = candidateLabels.length > 0
+      ? `已接受受限候选：${candidateLabels.join('；')}；支持证据观察：${supportObservations}`
+      : supportObservations;
     return {
       finding: text(runResult.decision?.summary, MISSING_TEXT),
       gate: text(runResult.decision?.nextAction, MISSING_TEXT),
       evidenceComparison: {
-        support: selected.map((candidate) => {
-          const label = text(candidate.label || candidate.mechanism_label || candidate.mechanism_id, MISSING_TEXT);
-          const evidenceCount = countItems(candidate.evidenceIds || candidate.support_evidence_ids);
-          return `${label}(${evidenceCount}项)`;
-        }).join('；') || MISSING_TEXT,
-        counter: countHypothesisEvidence(hypotheses, 'counter_evidence_ids') > 0
-          ? `${countHypothesisEvidence(hypotheses, 'counter_evidence_ids')}项反证`
-          : MISSING_TEXT,
-        missing: countHypothesisEvidence(hypotheses, 'missing_evidence_ids') > 0
-          ? `${countHypothesisEvidence(hypotheses, 'missing_evidence_ids')}项缺失`
-          : MISSING_TEXT
+        support,
+        counter: summarizeObservationEvidence(
+          observations,
+          'counter_evidence',
+          '反证',
+          invalidEvidenceIds
+        ),
+        missing: summarizeMissingEvidence(engineering, invalidEvidenceIds)
       }
     };
   }
@@ -146,7 +205,7 @@
 
   function buildStageModels(caseItem = {}, runResult = {}) {
     const opening = buildOpening(caseItem, runResult);
-    const evidenceSummary = buildEvidenceSummary(caseItem);
+    const evidenceSummary = buildEvidenceSummary(caseItem, runResult);
     const candidateComparison = buildCandidateComparison(caseItem, runResult);
     const validReferences = hasValidReferences(runResult);
     const invalidEvidenceIds = Array.isArray(runResult.audit?.invalidEvidenceIds)
@@ -170,7 +229,7 @@
         purpose: '读取企业问题原文并固定本案边界。',
         method: '只展示企业已提供的案例编号、功能域和问题描述，不把主张当作验证结论。',
         finding: opening.problem,
-        gate: opening.snapshotId
+        gate: G1_GATE
       },
       {
         ...FLOW_STEPS[1],
@@ -196,8 +255,8 @@
         state: validReferences ? 'current' : 'locked',
         purpose: '把技术结论交回企业人工审核门禁。',
         method: '只提交下一步动作，不批准根因、责任域或 OTA 因果。',
-        finding: currentData(caseItem.enterprise?.next_action),
-        gate: currentData(caseItem.enterprise?.next_action)
+        finding: currentData(runResult.decision?.nextAction),
+        gate: currentData(runResult.decision?.nextAction)
       },
       {
         ...FLOW_STEPS[4],
@@ -227,11 +286,10 @@
   }
 
   function buildDeliverable(caseItem = {}, runResult = {}) {
-    const enterprise = caseItem.enterprise || {};
     return {
       boundary: '不确认根因，不确认责任域，不确认 OTA 因果。',
-      status: text(enterprise.attribution_status, MISSING_TEXT),
-      nextAction: currentData(enterprise.next_action),
+      status: text(caseItem.enterprise?.attribution_status, MISSING_TEXT),
+      nextAction: currentData(runResult.decision?.nextAction),
       summary: text(runResult.decision?.summary, MISSING_TEXT),
       decisionCode: currentData(runResult.decision?.code)
     };

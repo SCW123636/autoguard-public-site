@@ -2,6 +2,11 @@
   const MISSING_TEXT = "\u5f53\u524d\u6570\u636e\u672a\u63d0\u4f9b";
   const DEFAULT_CASE_ID = "RCA-EXT-005";
   const STAGE_IDS = ["G1", "G2", "G3", "G4", "G5", "G6", "G7"];
+  const STAGE_STATE_LABELS = Object.freeze({
+    completed: "\u5df2\u5b8c\u6210",
+    current: "\u5f53\u524d\u9636\u6bb5",
+    locked: "\u5df2\u9501\u5b9a"
+  });
   const G1_PRE_VERIFICATION_FINDING = "\u672c\u9636\u6bb5\u4ec5\u8bb0\u5f55\u4f01\u4e1a\u62a5\u544a\u7684\u95ee\u9898\uff0c\u5c1a\u672a\u8fdb\u5165\u8bc1\u636e\u9a8c\u8bc1\u3002";
 
   function display(value, fallback = MISSING_TEXT) {
@@ -9,6 +14,10 @@
     if (value === null || value === undefined) return fallback;
     const rendered = String(value).trim();
     return rendered || fallback;
+  }
+
+  function stageStateLabel(state) {
+    return STAGE_STATE_LABELS[state] || display(state);
   }
 
   function getCaseSource() {
@@ -81,7 +90,7 @@
           activeStageId,
           onStageChange: setActiveStageId,
           activeStage,
-          investigationGoal: model.opening.goal || selectedCase.enterprise?.goal
+          investigationGoal: model.opening.goal
         })
       )
     );
@@ -164,7 +173,7 @@
       h("div", { className: "stage-panel-heading" },
         h("span", { className: "eyebrow mono" }, display(stage.id)),
         h("h2", { id: "stage-panel-title" }, display(stage.title)),
-        h("span", { className: "stage-state " + display(stage.state) }, display(stage.state))
+        h("span", { className: "stage-state " + display(stage.state) }, stageStateLabel(stage.state))
       ),
       h("div", { className: "stage-panel-grid" },
         h(PanelBlock, {

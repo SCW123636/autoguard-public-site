@@ -8,7 +8,7 @@ const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
 
-function renderPublishedApp(model, caseOverrides = {}) {
+function renderPublishedApp(model) {
   let rendered;
   const React = {
     createElement(type, props, ...children) {
@@ -50,7 +50,7 @@ function renderPublishedApp(model, caseOverrides = {}) {
           case_id: 'RCA-EXT-005',
           title: 'Test case',
           domain: 'Test domain',
-          ...caseOverrides
+          enterprise: {}
         }]
       },
       AutoGuardDemoEngine: { runCase: () => ({}) },
@@ -82,14 +82,14 @@ function findByClass(node, className) {
   return findByClass(node.children, className);
 }
 
-function caseFlowModel() {
+function caseFlowModel(stageStates = {}) {
   const enterpriseProblem = 'Enterprise report: unexpected behavior after an update.';
   const stage = (id) => ({
     id,
     code: id,
     shortTitle: id + ' title',
     title: id + ' stage',
-    state: 'current',
+    state: stageStates[id] || 'current',
     purpose: id + ' purpose',
     method: id + ' method',
     finding: id === 'G1' ? enterpriseProblem : id + ' finding',
@@ -103,7 +103,8 @@ function caseFlowModel() {
       problem: enterpriseProblem,
       snapshotId: 'SNAP-005',
       decisionCode: 'LIMITED_CANDIDATES_READY',
-      decisionLabel: 'Bounded candidates ready'
+      decisionLabel: 'Bounded candidates ready',
+      goal: '当前案例的排查目标。'
     },
     stages: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'].map(stage),
     deliverable: {
@@ -179,6 +180,23 @@ test('published demo engine derives the decision from evidence and not case ID',
   assert.equal(blocked.decision.code, 'EVIDENCE_REFERENCE_BLOCKED');
   assert.equal(blocked.decision.summary.length > 0, true);
   assert.deepEqual(blocked.audit.invalidEvidenceIds, ['EV-UNKNOWN-SUPPORT']);
+});
+
+test('published demo engine blocks spoofed IDs declared by observations and hypotheses', () => {
+  const engine = require(path.join(root, 'demo-engine.js'));
+  const workbench = require(path.join(root, 'data', 'real-rca-cases.js'));
+  const source = workbench.cases.find((item) => item.case_id === 'RCA-EXT-005');
+  const spoofed = JSON.parse(JSON.stringify(source));
+  const observationOnlyId = 'EV-SPOOFED-OBSERVATION';
+  const sharedSpoofedId = 'EV-SPOOFED-DECLARATION';
+
+  spoofed.engineering.derived_observations[0].evidence_ids.push(observationOnlyId, sharedSpoofedId);
+  spoofed.engineering.hypotheses[0].support_evidence_ids.push(sharedSpoofedId);
+
+  const result = engine.runCase(spoofed);
+
+  assert.equal(result.decision.code, 'EVIDENCE_REFERENCE_BLOCKED');
+  assert.deepEqual(result.audit.invalidEvidenceIds, [observationOnlyId, sharedSpoofedId]);
 });
 
 test('published demo engine preserves evidence-gate priority for overlapping conditions', () => {
@@ -275,11 +293,36 @@ test('published G1 keeps the enterprise report separate from the pre-verificatio
 });
 
 test('published case opening renders the investigation goal with a missing-data fallback', () => {
-  const model = caseFlowModel();
   const goal = 'Determine whether the available evidence supports a bounded investigation path.';
-  const renderedGoal = renderPublishedApp(model, { enterprise: { goal } });
-  const renderedMissingGoal = renderPublishedApp(model);
+  const model = caseFlowModel();
+  model.opening.goal = goal;
+  const renderedGoal = renderPublishedApp(model);
+  const missingGoalModel = caseFlowModel();
+  delete missingGoalModel.opening.goal;
+  const renderedMissingGoal = renderPublishedApp(missingGoalModel);
 
   assert.equal(collectText(renderedGoal).filter((value) => value === goal).length, 1);
   assert.ok(collectText(findByClass(renderedMissingGoal, 'case-opening-goal')).includes('当前数据未提供'));
+});
+
+test('published app renders Chinese labels for stage states', () => {
+  for (const [state, label] of [
+    ['completed', '已完成'],
+    ['current', '当前阶段'],
+    ['locked', '已锁定']
+  ]) {
+    const rendered = renderPublishedApp(caseFlowModel({ G1: state }));
+    assert.deepEqual(collectText(findByClass(rendered, 'stage-state')), [label], state);
+  }
+});
+
+test('published app consumes the adapted opening goal', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.match(app, /investigationGoal:\s*model\.opening\.goal/);
+  assert.doesNotMatch(app, /selectedCase\.enterprise\?\.goal/);
+});
+
+test('focused mobile header resets the generic brand underline', () => {
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  assert.match(styles, /\.focused-demo-header \.brand-lockup\s*\{[^}]*border-bottom:\s*0/);
 });

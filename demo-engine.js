@@ -43,21 +43,22 @@
 
   function collectKnownEvidenceIds(caseItem) {
     const engineering = caseItem.engineering || {};
-    const observationIds = asArray(engineering.derived_observations)
-      .flatMap((item) => asArray(item.evidence_ids));
     return new Set([
       ...asArray(engineering.evidence_items).map((item) => item?.evidence_id),
-      ...asArray(engineering.missing_evidence_ids),
-      ...observationIds
-    ].filter(Boolean));
+      ...asArray(engineering.missing_evidence_ids)
+    ].filter((value) => typeof value === 'string' && value.trim()));
   }
 
   function collectReferencedEvidenceIds(caseItem) {
-    return unique(asArray(caseItem.engineering?.hypotheses).flatMap((candidate) => [
+    const engineering = caseItem.engineering || {};
+    const observationReferences = asArray(engineering.derived_observations)
+      .flatMap((observation) => asArray(observation?.evidence_ids));
+    const hypothesisReferences = asArray(engineering.hypotheses).flatMap((candidate) => [
       ...asArray(candidate.support_evidence_ids),
       ...asArray(candidate.counter_evidence_ids),
       ...asArray(candidate.missing_evidence_ids)
-    ]));
+    ]);
+    return unique([...observationReferences, ...hypothesisReferences]);
   }
 
   function makeCandidate(candidate) {
