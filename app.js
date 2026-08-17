@@ -2,6 +2,7 @@
   const MISSING_TEXT = "\u5f53\u524d\u6570\u636e\u672a\u63d0\u4f9b";
   const DEFAULT_CASE_ID = "RCA-EXT-005";
   const STAGE_IDS = ["G1", "G2", "G3", "G4", "G5", "G6", "G7"];
+  const G1_PRE_VERIFICATION_FINDING = "\u672c\u9636\u6bb5\u4ec5\u8bb0\u5f55\u4f01\u4e1a\u62a5\u544a\u7684\u95ee\u9898\uff0c\u5c1a\u672a\u8fdb\u5165\u8bc1\u636e\u9a8c\u8bc1\u3002";
 
   function display(value, fallback = MISSING_TEXT) {
     if (Array.isArray(value)) return value.length ? value.join("\uff1b") : fallback;
@@ -79,7 +80,8 @@
           model,
           activeStageId,
           onStageChange: setActiveStageId,
-          activeStage
+          activeStage,
+          investigationGoal: model.opening.goal || selectedCase.enterprise?.goal
         })
       )
     );
@@ -106,7 +108,7 @@
     );
   }
 
-  function SingleCaseFlow({ model, activeStageId, onStageChange, activeStage }) {
+  function SingleCaseFlow({ model, activeStageId, onStageChange, activeStage, investigationGoal }) {
     return h("article", { className: "single-case-flow" },
       h("section", { className: "case-opening", "aria-labelledby": "case-opening-title" },
         h("div", { className: "case-opening-meta" },
@@ -119,6 +121,10 @@
           h("span", null, "\u4f01\u4e1a\u95ee\u9898\u539f\u6587"),
           h("p", null, display(model.opening.problem))
         ),
+        h("div", { className: "case-opening-goal" },
+          h("span", null, "\u672c\u6848\u6392\u67e5\u76ee\u6807"),
+          h("p", null, display(investigationGoal))
+        ),
         h("div", { className: "case-opening-status" },
           h("span", null, "\u5f53\u524d\u5904\u7406\u72b6\u6001"),
           h("strong", null, display(model.opening.decisionLabel)),
@@ -126,7 +132,7 @@
         )
       ),
       h(StageRail, { stages: model.stages, activeStageId, onStageChange }),
-      h(StagePanel, { stage: activeStage }),
+      h(StagePanel, { stage: activeStage, opening: model.opening }),
       h(StageNavigation, {
         stages: model.stages,
         activeStageId,
@@ -151,8 +157,9 @@
     );
   }
 
-  function StagePanel({ stage }) {
+  function StagePanel({ stage, opening = {} }) {
     if (!stage) return null;
+    const isG1 = stage.id === "G1";
     return h("section", { className: "stage-panel", "aria-labelledby": "stage-panel-title" },
       h("div", { className: "stage-panel-heading" },
         h("span", { className: "eyebrow mono" }, display(stage.id)),
@@ -161,10 +168,15 @@
       ),
       h("div", { className: "stage-panel-grid" },
         h(PanelBlock, {
-          label: "\u4f01\u4e1a\u95ee\u9898",
-          value: stage.id === "G1" ? stage.finding : stage.purpose
+          className: "stage-enterprise-question",
+          label: isG1 ? "\u4f01\u4e1a\u62a5\u544a\uff08\u672a\u7ecf\u9a8c\u8bc1\uff09" : "\u4f01\u4e1a\u95ee\u9898",
+          value: isG1 ? opening.problem : stage.purpose
         }),
-        h(PanelBlock, { label: "\u771f\u5b9e\u6570\u636e\u53d1\u73b0", value: stage.finding }),
+        h(PanelBlock, {
+          className: "stage-real-data-finding",
+          label: "\u771f\u5b9e\u6570\u636e\u53d1\u73b0",
+          value: isG1 ? G1_PRE_VERIFICATION_FINDING : stage.finding
+        }),
         h(PanelBlock, { label: "\u6211\u4eec\u7684\u65b9\u5f0f", value: stage.method }),
         h(PanelBlock, { label: "\u4e0b\u4e00\u6b65\u95e8\u7981", value: stage.gate })
       ),
@@ -174,8 +186,8 @@
     );
   }
 
-  function PanelBlock({ label, value }) {
-    return h("div", { className: "stage-panel-block" },
+  function PanelBlock({ className = "", label, value }) {
+    return h("div", { className: "stage-panel-block " + className },
       h("span", null, label),
       h("p", null, display(value))
     );

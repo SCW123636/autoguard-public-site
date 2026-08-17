@@ -4,8 +4,116 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
+const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
+
+function renderPublishedApp(model, caseOverrides = {}) {
+  let rendered;
+  const React = {
+    createElement(type, props, ...children) {
+      return { type, props: props || {}, children };
+    },
+    useEffect() {},
+    useMemo(callback) {
+      return callback();
+    },
+    useState(initialValue) {
+      return [initialValue, () => {}];
+    }
+  };
+
+  function resolve(element) {
+    if (Array.isArray(element)) return element.map(resolve);
+    if (element === null || element === undefined || typeof element !== 'object') return element;
+    if (typeof element.type === 'function') {
+      return resolve(element.type({ ...element.props, children: element.children }));
+    }
+    return { ...element, children: element.children.map(resolve) };
+  }
+
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), {
+    React,
+    ReactDOM: {
+      createRoot() {
+        return {
+          render(element) {
+            rendered = resolve(element);
+          }
+        };
+      }
+    },
+    document: { getElementById: () => ({}) },
+    window: {
+      AutoGuardRealRcaCases: {
+        cases: [{
+          case_id: 'RCA-EXT-005',
+          title: 'Test case',
+          domain: 'Test domain',
+          ...caseOverrides
+        }]
+      },
+      AutoGuardDemoEngine: { runCase: () => ({}) },
+      AutoGuardPresentation: { buildCaseFlow: () => model }
+    }
+  });
+
+  return rendered;
+}
+
+function collectText(node) {
+  if (Array.isArray(node)) return node.flatMap(collectText);
+  if (node === null || node === undefined || typeof node === 'object') {
+    return node && typeof node === 'object' ? collectText(node.children) : [];
+  }
+  return [String(node)];
+}
+
+function findByClass(node, className) {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const match = findByClass(item, className);
+      if (match) return match;
+    }
+    return null;
+  }
+  if (!node || typeof node !== 'object') return null;
+  if (node.props?.className?.split(' ').includes(className)) return node;
+  return findByClass(node.children, className);
+}
+
+function caseFlowModel() {
+  const enterpriseProblem = 'Enterprise report: unexpected behavior after an update.';
+  const stage = (id) => ({
+    id,
+    code: id,
+    shortTitle: id + ' title',
+    title: id + ' stage',
+    state: 'current',
+    purpose: id + ' purpose',
+    method: id + ' method',
+    finding: id === 'G1' ? enterpriseProblem : id + ' finding',
+    gate: id + ' gate'
+  });
+  return {
+    opening: {
+      caseId: 'RCA-EXT-005',
+      title: 'Test case',
+      domain: 'Test domain',
+      problem: enterpriseProblem,
+      snapshotId: 'SNAP-005',
+      decisionCode: 'LIMITED_CANDIDATES_READY',
+      decisionLabel: 'Bounded candidates ready'
+    },
+    stages: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'].map(stage),
+    deliverable: {
+      summary: 'Summary',
+      status: 'Status',
+      nextAction: 'Action',
+      boundary: 'Boundary'
+    }
+  };
+}
 
 test('GitHub Pages entry loads the single-case runtime in deterministic order', () => {
   const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -122,4 +230,26 @@ test('published app exposes only the dynamic single-case flow', () => {
   }
   assert.doesNotMatch(app, /LiveAnalysisDemo/);
   assert.doesNotMatch(app, /live-method-line/);
+});
+
+test('published G1 keeps the enterprise report separate from the pre-verification finding', () => {
+  const model = caseFlowModel();
+  const rendered = renderPublishedApp(model);
+  const reportContent = collectText(findByClass(rendered, 'stage-enterprise-question'));
+  const findingContent = collectText(findByClass(rendered, 'stage-real-data-finding'));
+
+  assert.ok(reportContent.includes('企业报告（未经验证）'));
+  assert.ok(reportContent.includes(model.opening.problem));
+  assert.ok(!findingContent.includes(model.opening.problem));
+  assert.ok(findingContent.includes('本阶段仅记录企业报告的问题，尚未进入证据验证。'));
+});
+
+test('published case opening renders the investigation goal with a missing-data fallback', () => {
+  const model = caseFlowModel();
+  const goal = 'Determine whether the available evidence supports a bounded investigation path.';
+  const renderedGoal = renderPublishedApp(model, { enterprise: { goal } });
+  const renderedMissingGoal = renderPublishedApp(model);
+
+  assert.equal(collectText(renderedGoal).filter((value) => value === goal).length, 1);
+  assert.ok(collectText(findByClass(renderedMissingGoal, 'case-opening-goal')).includes('当前数据未提供'));
 });
